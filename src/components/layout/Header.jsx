@@ -25,16 +25,16 @@ const Header = () => {
                         Home
                     </a>
                     <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
-                        Team
-                    </a>
-                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
-                        Features
-                    </a>
-                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
-                        Blog
-                    </a>
-                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
                         About
+                    </a>
+                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
+                        Services
+                    </a>
+                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
+                        Contact
+                    </a>
+                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
+                        Terms and Conditions
                     </a>
                 </nav>
 

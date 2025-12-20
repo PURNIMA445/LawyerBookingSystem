@@ -1,9 +1,10 @@
 import React from 'react'
-import Header from './components/layout/Header.jsx';
-
+import MyRoute from './MyRoute'
 const App = () => {
   return (
-    <Header />
+    <>
+    <MyRoute />
+    </>
   )
 }
 
