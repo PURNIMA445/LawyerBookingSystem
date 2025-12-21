@@ -25,8 +25,9 @@ const HomePage = () => {
           </p>
         </div>
       </div>
-      <div className="w-full p-4">
-        <div className="flex flex-col md:flex-row gap-3">
+      <div className="w-full p-4 ">
+      <div className="flex flex-col max-w-7xl md:flex-row gap-3  md:px-7 py-4 mx-auto">
+
           {/* Location Input */}
           <div className="flex-1">
             <label className="block text-sm text-gray-900 mb-2">
@@ -67,9 +68,10 @@ const HomePage = () => {
             <label className="block text-sm text-gray-900 mb-2 md:hidden">
               &nbsp;
             </label>
-            <button className="w-full md:w-auto px-8 py-3 bg-blue-600 text-white rounded-lg">
-              Search
-            </button>
+            <button className="w-full py-2 md:w-auto md:py-7 px-6 bg-blue-600 text-white rounded-lg">
+  Search
+</button>
+
           </div>
         </div>
       </div>
