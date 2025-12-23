@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 
 import { IoMdClose } from "react-icons/io";
+import { Link } from "react-router-dom";
 const Header = () => {
     const [toggle, setToggle] = useState(false)
     const handleToggle = () => {
@@ -21,21 +22,24 @@ const Header = () => {
                 <nav
                     className={`${toggle ? "flex" : "hidden"} flex-col gap-4 lg:flex lg:flex-row lg:gap-8`}
                 >
-                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
+                    <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium">
                         Home
-                    </a>
-                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
+                    </Link>
+                    <Link to="/aboutus" className="text-gray-700 hover:text-blue-600 font-medium">
                         About
-                    </a>
-                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
+                    </Link>
+                    <Link to="/services" className="text-gray-700 hover:text-blue-600 font-medium">
                         Services
-                    </a>
-                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
+                    </Link>
+                    <Link to="/contact" className="text-gray-700 hover:text-blue-600 font-medium">
                         Contact
-                    </a>
-                    <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
+                    </Link>
+                    <Link to="/terms" className="text-gray-700 hover:text-blue-600 font-medium">
                         Terms and Conditions
-                    </a>
+                    </Link>
+                    <Link to="/FAQ" className="text-gray-700 hover:text-blue-600 font-medium">
+                        FAQ
+                    </Link>
                 </nav>
 
 
