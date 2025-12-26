@@ -1,80 +1,133 @@
 import React, { useState } from "react";
-import { GiHamburgerMenu } from "react-icons/gi";
-
-import { IoMdClose } from "react-icons/io";
 import { Link } from "react-router-dom";
-const Header = () => {
-    const [toggle, setToggle] = useState(false)
-    const handleToggle = () => {
-        setToggle(!toggle)
+import { GiHamburgerMenu } from "react-icons/gi";
+import { IoMdClose } from "react-icons/io";
 
-    }
-    return (
-        <header className="w-full border-b border-gray-200 bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+const Navbar = () => {
+  const [toggle, setToggle] = useState(false);
 
-                {/* Logo */}
-                <div className="text-xl font-bold tracking-wide">
-                    LEXAPPOINTMENT
-                </div>
+  const handleToggle = () => {
+    setToggle(!toggle);
+  };
 
-                {/* Navbar Menu */}
-                <nav
-                    className={`${toggle ? "flex" : "hidden"} flex-col gap-4 lg:flex lg:flex-row lg:gap-8`}
-                >
-                    <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium">
-                        Home
-                    </Link>
-                    <Link to="/aboutus" className="text-gray-700 hover:text-blue-600 font-medium">
-                        About
-                    </Link>
-                    <Link to="/services" className="text-gray-700 hover:text-blue-600 font-medium">
-                        Services
-                    </Link>
-                    <Link to="/contact" className="text-gray-700 hover:text-blue-600 font-medium">
-                        Contact
-                    </Link>
-                    <Link to="/terms" className="text-gray-700 hover:text-blue-600 font-medium">
-                        Terms and Conditions
-                    </Link>
-                    <Link to="/FAQ" className="text-gray-700 hover:text-blue-600 font-medium">
-                        FAQ
-                    </Link>
-                </nav>
+  return (
+    <div className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        {/* Main Navbar Row */}
+        <div className="flex items-center justify-between lg:justify-center relative">
+          
 
+          {/* Logo - Center on Mobile, Left on Desktop */}
+          <Link 
+            to="/" 
+            className="text-xl font-bold tracking-wide text-orange-600 absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0"
+          >
+            LEGALCONNECT
+          </Link>
 
-                {/* Right Section */}
-                <div className="flex items-center gap-4">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-8 ml-12">
+            <Link to="/home" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">
+              Home
+            </Link>
+            <Link to="/aboutus" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">
+              About
+            </Link>
+            <Link to="/services" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">
+              Services
+            </Link>
+            <Link to="/contact" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">
+              Contact
+            </Link>
+            <Link to="/terms" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">
+              Terms
+            </Link>
+            <Link to="/FAQ" className="text-gray-700 hover:text-amber-600 font-medium transition-colors">
+              FAQ
+            </Link>
+            <Link
+              to="/login"
+              className="bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-6 py-2 rounded-md transition-all"
+            >
+              Login
+            </Link>
+          </nav>
 
-                    {/* Search (Desktop only) */}
-                    <div className="hidden sm:flex items-center rounded-md ">
-                        <button className="bg-blue-600  text-white px-6 py-2 rounded-md font-medium transition">
-                            Login
-                        </button>
+          {/* Spacer for mobile */}
+          <div className="lg:hidden w-11"></div>
+        {/* Hamburger - Left Side on Mobile */}
+        <div
+            onClick={handleToggle}
+            className="lg:hidden cursor-pointer p-2 rounded-md text-gray-800 hover:text-amber-600 hover:bg-gray-100 transition-all duration-200 active:scale-95"
+          >
+            {toggle ? (
+              <IoMdClose className="w-7 h-7" />
+            ) : (
+              <GiHamburgerMenu className="w-7 h-7" />
+            )}
+          </div>
+        </div>
 
-                    </div>
+        {/* Mobile Dropdown Menu */}
+        {toggle && (
+          <div className="lg:hidden mt-4 pb-4 border-t border-gray-200 pt-4">
+            <nav className="flex flex-col gap-3">
+              <Link
+                to="/home"
+                className="text-gray-700 hover:text-amber-600 hover:bg-gray-50 font-medium py-2 px-4 rounded-md transition-colors"
+                onClick={handleToggle}
+              >
+                Home
+              </Link>
+              <Link
+                to="/aboutus"
+                className="text-gray-700 hover:text-amber-600 hover:bg-gray-50 font-medium py-2 px-4 rounded-md transition-colors"
+                onClick={handleToggle}
+              >
+                About
+              </Link>
+              <Link
+                to="/services"
+                className="text-gray-700 hover:text-amber-600 hover:bg-gray-50 font-medium py-2 px-4 rounded-md transition-colors"
+                onClick={handleToggle}
+              >
+                Services
+              </Link>
+              <Link
+                to="/contact"
+                className="text-gray-700 hover:text-amber-600 hover:bg-gray-50 font-medium py-2 px-4 rounded-md transition-colors"
+                onClick={handleToggle}
+              >
+                Contact
+              </Link>
+              <Link
+                to="/terms"
+                className="text-gray-700 hover:text-amber-600 hover:bg-gray-50 font-medium py-2 px-4 rounded-md transition-colors"
+                onClick={handleToggle}
+              >
+                Terms and Conditions
+              </Link>
+              <Link
+                to="/FAQ"
+                className="text-gray-700 hover:text-amber-600 hover:bg-gray-50 font-medium py-2 px-4 rounded-md transition-colors"
+                onClick={handleToggle}
+              >
+                FAQ
+              </Link>
 
-                    {/* Hamburger icon*/}
-
-                    <div
-                        onClick={handleToggle}
-                        className="lg:hidden cursor-pointer p-2 rounded-md 
-                        text-gray-800 hover:text-blue-600 
-                        hover:bg-gray-100 
-                        transition-all duration-200 
-                        active:scale-95"
-                    >
-                        {toggle ? (
-                            <IoMdClose className="w-7 h-7 transition-transform duration-200" />
-                        ) : (
-                            <GiHamburgerMenu className="w-7 h-7 transition-transform duration-200" />
-                        )}
-                    </div>
-
-                </div>
-            </div>
-        </header>
-    );
+              <Link
+                to="/login"
+                className="mt-2 bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white py-2 px-4 rounded-md text-center font-medium transition-all"
+                onClick={handleToggle}
+              >
+                Login
+              </Link>
+            </nav>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
-export default Header;
+export default Navbar;
