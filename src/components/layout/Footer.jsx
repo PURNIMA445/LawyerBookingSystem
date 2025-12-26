@@ -11,7 +11,7 @@ const Footer = () => {
       {/* Logo */}
       <div className="flex items-start justify-center sm:justify-start">
         <Link to="/">
-          <h1 className="text-2xl sm:text-3xl text-white font-semibold hover:text-amber-500 transition duration-300">
+          <h1 className="text-2xl sm:text-3xl text-white font-semibold hover:text-indigo-500 transition duration-300">
             LEGALCONNECT
           </h1>
         </Link>
@@ -20,33 +20,34 @@ const Footer = () => {
       {/* Social Icons */}
       <div className="flex items-start justify-center sm:justify-start">
         <div>
-          <h4 className="text-base mb-4 text-amber-500">Follow Us</h4>
+          <h4 className="text-base mb-4 text-white">Follow Us</h4>
           <ul className="flex space-x-6 justify-center sm:justify-start">
             <li>
               <Link
                 to="#"
                 aria-label="Facebook"
-                className="text-slate-400 hover:text-amber-500 text-2xl transition duration-300"
+                className="text-white hover:text-blue-500 text-2xl transition duration-300"
               >
                 <FaFacebook />
+              </Link>
+            </li>
+            
+            <li>
+              <Link
+                to="#"
+                aria-label="Instagram"
+                className="text-white hover:text-yellow-400 text-2xl transition duration-300"
+              >
+                <FaInstagramSquare />
               </Link>
             </li>
             <li>
               <Link
                 to="#"
                 aria-label="LinkedIn"
-                className="text-slate-400 hover:text-amber-500 text-2xl transition duration-300"
+                className="text-white hover:text-blue-500 text-2xl transition duration-300"
               >
                 <FaLinkedin />
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="#"
-                aria-label="Instagram"
-                className="text-slate-400 hover:text-amber-500 text-2xl transition duration-300"
-              >
-                <FaInstagramSquare />
               </Link>
             </li>
           </ul>
@@ -55,7 +56,7 @@ const Footer = () => {
 
       {/* Contact Info */}
       <div className="text-center sm:text-left">
-        <h4 className="text-base mb-4 text-amber-500">Contact Info</h4>
+        <h4 className="text-base mb-4 text-white">Contact Info</h4>
         <ul className="space-y-3">
           <li className="text-slate-400 text-sm leading-relaxed">
             4th Floor, Shree Pashupati Complex, New Road, Kathmandu, 44600
@@ -76,7 +77,7 @@ const Footer = () => {
 
       {/* Information */}
       <div className="text-center sm:text-left">
-        <h4 className="text-base mb-4 text-amber-500">Information</h4>
+        <h4 className="text-base mb-4 text-white">Information</h4>
         <ul className="space-y-3">
           <li>
             <Link

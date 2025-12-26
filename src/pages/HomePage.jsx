@@ -4,14 +4,10 @@ const HomePage = () => {
   return (
     <div>
       <div
-        className="relative flex flex-col items-center justify-center text-center py-20 px-6 md:px-12 border-2 bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "url('https://tse3.mm.bing.net/th/id/OIP.P42lJrA1NSLvI0Sme_KR2AHaE8?rs=1&pid=ImgDetMain&o=7&rm=3')",
-        }}
+        className="relative flex flex-col items-center justify-center text-center py-20 px-6 md:px-12  bg-[#142768]"
+        
       >
-      
-        <div className="absolute inset-0 bg-black/70"></div>
+
 
      
         <div className="relative z-10 max-w-3xl">

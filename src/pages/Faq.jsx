@@ -59,7 +59,7 @@ const AccordionItem = ({ question, answer, isOpen, onClick }) => {
       >
         <span className="font-medium text-gray-800 pr-4">{question}</span>
         <span className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-          <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </span>
@@ -170,7 +170,7 @@ const FAQ = () => {
            
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               Frequently Asked
-              <span className="block text-transparent bg-clip-text bg-linear-to-r from-amber-600 to-orange-600">
+              <span className="block text-transparent bg-clip-text bg-[#142768]">
                 Questions
               </span>
             </h1>
@@ -185,8 +185,8 @@ const FAQ = () => {
                 <input
                   type="text"
                   placeholder="Search your question..."
-                  className="w-full px-6 py-4 pl-14 rounded-2xl border border-gray-200 shadow-lg shadow-gray-100/50 
-                    focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent
+                  className="w-full px-6 py-4 pl-14 rounded-2xl border border-gray-500 shadow-lg shadow-gray-100/50 
+                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
                     transition-all duration-300"
                 />
                 <svg className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -238,10 +238,10 @@ const FAQ = () => {
                       onClick={() => setActiveCategory(idx)}
                       className={`w-full text-left px-5 py-4 rounded-xl transition-all duration-300 flex items-center gap-3
                         ${activeCategory === idx 
-                          ? 'bg-linear-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-200' 
+                          ? 'bg-[#142768] text-white shadow-lg ' 
                           : 'bg-white hover:bg-gray-50 text-gray-700 shadow-sm'}`}
                     >
-                      <span className={`w-2 h-2 rounded-full ${activeCategory === idx ? 'bg-white' : 'bg-amber-500'}`}></span>
+                      <span className={`w-2 h-2 rounded-full ${activeCategory === idx ? 'bg-white' : 'bg-indigo-500'}`}></span>
                       {category.category}
                       <span className={`ml-auto text-sm ${activeCategory === idx ? 'text-amber-100' : 'text-gray-400'}`}>
                         {category.questions.length}
@@ -251,15 +251,15 @@ const FAQ = () => {
                 </nav>
 
                 {/* Contact Card */}
-                <div className="mt-8 p-6 bg-linear-to-br from-slate-800 to-slate-900 rounded-2xl text-white">
-                  <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center mb-4">
+                <div className="mt-8 p-6 bg-slate-900  rounded-2xl text-white">
+                  <div className="w-12 h-12 bg-indigo-900 rounded-xl flex items-center justify-center mb-4">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>
                   <h4 className="font-semibold text-lg mb-2">Still have questions?</h4>
                   <p className="text-slate-400 text-sm mb-4">Our support team is here to help you 24/7</p>
-                  <button className="w-full py-3 bg-amber-500 hover:bg-amber-600 rounded-xl font-medium transition-colors duration-300">
+                  <button className="w-full py-3 bg-[#142768] hover:bg-indigo-600 rounded-xl font-medium transition-colors duration-300">
                     Contact Support
                   </button>
                 </div>

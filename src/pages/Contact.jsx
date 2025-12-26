@@ -1,5 +1,6 @@
 // Contact.jsx
 import React, { useState } from 'react';
+import AddressMap from './AddressMap';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -103,11 +104,8 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-amber-50">
       {/* Hero Section */}
-      <section className="relative py-16 lg:py-24 overflow-hidden">
-        {/* Background Decoration */}
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-linear-to-l from-amber-100/50 to-transparent -z-10"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-200/30 rounded-full blur-3xl -z-10"></div>
-
+      <section className="relative py-12 lg:py-14 overflow-hidden">
+        
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
             {/* Badge */}
@@ -120,7 +118,7 @@ const Contact = () => {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               Contact Our
-              <span className="block text-transparent bg-clip-text bg-linear-to-r from-amber-600 to-orange-600">
+              <span className="block text-transparent bg-clip-text bg-[#142768]">
                 Legal Team
               </span>
             </h1>
@@ -145,7 +143,7 @@ const Contact = () => {
                 </svg>
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">Call Us</h3>
-              <p className="text-amber-600 font-medium">+1 (800) 555-LEGAL</p>
+              <p className="text-[#142768] font-medium">+977 9800000000</p>
               <p className="text-gray-500 text-sm mt-1">Available 24/7</p>
             </div>
 
@@ -158,7 +156,7 @@ const Contact = () => {
                 </svg>
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">Email Us</h3>
-              <p className="text-amber-600 font-medium">contact@lawfirm.com</p>
+              <p className="text-[#142768] font-medium">contact@lawfirm.com</p>
               <p className="text-gray-500 text-sm mt-1">Response within 24hrs</p>
             </div>
 
@@ -172,20 +170,20 @@ const Contact = () => {
                 </svg>
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">Visit Us</h3>
-              <p className="text-amber-600 font-medium">3 Locations</p>
+              <p className="text-[#142768] font-medium">3 Locations</p>
               <p className="text-gray-500 text-sm mt-1">NYC, LA, Chicago</p>
             </div>
 
             {/* Live Chat */}
             <div className="group bg-white p-6 rounded-2xl shadow-lg shadow-gray-100/50 hover:shadow-xl transition-all duration-300 text-center">
-              <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4
+              <div className="w-14 h-14 bg-amber-100 text-[#142768] rounded-2xl flex items-center justify-center mx-auto mb-4
                 group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">Live Chat</h3>
-              <p className="text-amber-600 font-medium">Chat Now</p>
+              <p className="text-[#142768] font-medium">Chat Now</p>
               <p className="text-gray-500 text-sm mt-1">Instant Support</p>
             </div>
           </div>
@@ -219,7 +217,7 @@ const Contact = () => {
                         required
                         placeholder="John Doe"
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
-                          focus:ring-amber-500 focus:border-transparent transition-all duration-300"
+                          focus:ring-[#142768] focus:border-transparent transition-all duration-300"
                       />
                     </div>
                     <div>
@@ -234,7 +232,7 @@ const Contact = () => {
                         required
                         placeholder="john@example.com"
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
-                          focus:ring-amber-500 focus:border-transparent transition-all duration-300"
+                          focus:ring-[#142768] focus:border-transparent transition-all duration-300"
                       />
                     </div>
                   </div>
@@ -252,7 +250,7 @@ const Contact = () => {
                         onChange={handleChange}
                         placeholder="+1 (555) 000-0000"
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
-                          focus:ring-amber-500 focus:border-transparent transition-all duration-300"
+                          focus:ring-[#142768] focus:border-transparent transition-all duration-300"
                       />
                     </div>
                     <div>
@@ -267,7 +265,7 @@ const Contact = () => {
                         required
                         placeholder="How can we help?"
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
-                          focus:ring-amber-500 focus:border-transparent transition-all duration-300"
+                          focus:ring-[#142768] focus:border-transparent transition-all duration-300"
                       />
                     </div>
                   </div>
@@ -283,7 +281,7 @@ const Contact = () => {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
-                        focus:ring-amber-500 focus:border-transparent transition-all duration-300 bg-white"
+                        focus:ring-[#142768] focus:border-transparent transition-all duration-300 bg-white"
                     >
                       <option value="">Select a case type</option>
                       {caseTypes.map((type, idx) => (
@@ -307,7 +305,7 @@ const Contact = () => {
                               value={method}
                               checked={formData.preferredContact === method}
                               onChange={handleChange}
-                              className="w-4 h-4 text-amber-500 focus:ring-amber-500 border-gray-300"
+                              className="w-4 h-4 text-amber-500 focus:ring-[#142768] border-gray-300"
                             />
                             <span className="text-gray-700 capitalize">{method}</span>
                           </label>
@@ -327,7 +325,7 @@ const Contact = () => {
                               value={level}
                               checked={formData.urgency === level}
                               onChange={handleChange}
-                              className="w-4 h-4 text-amber-500 focus:ring-amber-500 border-gray-300"
+                              className="w-4 h-4 text-amber-500 focus:ring-[#142768] border-gray-300"
                             />
                             <span className={`capitalize ${level === 'urgent' ? 'text-red-600 font-medium' : 'text-gray-700'}`}>
                               {level}
@@ -351,7 +349,7 @@ const Contact = () => {
                       rows={5}
                       placeholder="Please describe your legal matter in detail..."
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
-                        focus:ring-amber-500 focus:border-transparent transition-all duration-300 resize-none"
+                        focus:ring-[#142768] focus:border-transparent transition-all duration-300 resize-none"
                     ></textarea>
                   </div>
 
@@ -360,7 +358,7 @@ const Contact = () => {
                     <input
                       type="checkbox"
                       required
-                      className="w-5 h-5 mt-0.5 text-amber-500 focus:ring-amber-500 border-gray-300 rounded"
+                      className="w-5 h-5 mt-0.5 text-amber-500 focus:ring-[#142768] border-gray-300 rounded"
                     />
                     <p className="text-sm text-gray-600">
                       I agree to the <a href="#" className="text-amber-600 hover:underline">Privacy Policy</a> and 
@@ -372,8 +370,8 @@ const Contact = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 bg-linear-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl
-                      hover:shadow-lg hover:shadow-amber-200 transition-all duration-300 hover:-translate-y-0.5
+                    className="w-full py-4 bg-[#142768] text-white font-semibold rounded-xl
+                      hover:shadow-lg hover:shadow-indigo-900 transition-all duration-300 hover:-translate-y-0.5
                       disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0
                       flex items-center justify-center gap-2"
                   >
@@ -406,7 +404,7 @@ const Contact = () => {
                 {officeLocations.map((office, idx) => (
                   <div key={idx} className="bg-white rounded-2xl shadow-lg shadow-gray-100/50 p-6 hover:shadow-xl transition-all duration-300">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-linear-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 bg-[#142768] rounded-xl flex items-center justify-center shrink-0">
                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
@@ -471,16 +469,17 @@ const Contact = () => {
       <section className="py-12 bg-gray-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-            <div className="aspect-21/9 bg-gray-200 flex items-center justify-center">
-              {/* Replace with actual map embed */}
-              <div className="text-center text-gray-500">
-                <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                </svg>
-                <p className="font-medium">Interactive Map</p>
-                <p className="text-sm">Embed Google Maps or Mapbox here</p>
-              </div>
-            </div>
+            {/* Map Section */}
+<section className="py-12 bg-gray-100">
+  <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+      <div className="aspect-video">
+        <AddressMap />
+      </div>
+    </div>
+  </div>
+</section>
+
           </div>
         </div>
       </section>

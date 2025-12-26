@@ -1,0 +1,872 @@
+// SignUp.jsx
+import React, { useState } from 'react';
+
+const SignUp = () => {
+  const [step, setStep] = useState(1);
+  const [userType, setUserType] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const [formData, setFormData] = useState({
+    // Common fields
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    agreeTerms: false,
+    
+    // Lawyer specific
+    barNumber: '',
+    lawFirm: '',
+    specialization: [],
+    yearsOfExperience: '',
+    licenseDocument: null,
+    
+    // Admin specific
+    adminCode: '',
+    department: '',
+    
+    // Client specific
+    dateOfBirth: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: ''
+  });
+
+  const userTypes = [
+    {
+      id: 'client',
+      title: 'Client',
+      icon: '👤',
+      description: 'Book consultations and manage your legal matters',
+      color: 'indigo-900',
+      bgLight: 'bg-indigo-50',
+      textColor: 'text-indigo-600',
+      borderColor: 'border-indigo-500'
+    },
+    {
+      id: 'lawyer',
+      title: 'Lawyer',
+      icon: '⚖️',
+      description: 'Offer your legal services and manage appointments',
+      color: 'indigo-900',
+      bgLight: 'bg-indigo-50',
+      textColor: 'text-indigo-600',
+      borderColor: 'border-indigo-500'
+    },
+    {
+      id: 'admin',
+      title: 'Admin',
+      icon: '🛡️',
+      description: 'Manage platform operations and user accounts',
+      color: 'indigo-900',
+      bgLight: 'bg-indigo-50',
+      textColor: 'text-indigo-600',
+      borderColor: 'border-indigo-500'
+    }
+  ];
+
+  const specializations = [
+    'Family Law',
+    'Criminal Defense',
+    'Corporate Law',
+    'Immigration',
+    'Real Estate',
+    'Personal Injury',
+    'Employment Law',
+    'Intellectual Property',
+    'Tax Law',
+    'Bankruptcy',
+    'Civil Rights',
+    'Environmental Law'
+  ];
+
+  const departments = [
+    'User Management',
+    'Lawyer Verification',
+    'Support & Help Desk',
+    'Finance & Billing',
+    'Platform Operations',
+    'Content Management'
+  ];
+
+  const handleChange = (e) => {
+    const { name, value, type, checked, files } = e.target;
+    
+    if (type === 'file') {
+      setFormData(prev => ({ ...prev, [name]: files[0] }));
+    } else if (type === 'checkbox' && name === 'specialization') {
+      setFormData(prev => ({
+        ...prev,
+        specialization: checked 
+          ? [...prev.specialization, value]
+          : prev.specialization.filter(s => s !== value)
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
+    
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateStep2 = () => {
+    const newErrors = {};
+    
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Invalid email format';
+    }
+    if (!formData.phone) {
+      newErrors.phone = 'Phone number is required';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep3 = () => {
+    const newErrors = {};
+    
+    if (userType === 'lawyer') {
+      if (!formData.barNumber.trim()) newErrors.barNumber = 'Bar number is required';
+      if (!formData.yearsOfExperience) newErrors.yearsOfExperience = 'Experience is required';
+      if (formData.specialization.length === 0) newErrors.specialization = 'Select at least one specialization';
+    }
+    
+    if (userType === 'admin') {
+      if (!formData.adminCode.trim()) newErrors.adminCode = 'Admin code is required';
+      if (!formData.department) newErrors.department = 'Department is required';
+    }
+    
+    if (userType === 'client') {
+      if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
+      if (!formData.address.trim()) newErrors.address = 'Address is required';
+      if (!formData.city.trim()) newErrors.city = 'City is required';
+      if (!formData.state.trim()) newErrors.state = 'State is required';
+    }
+    
+    if (!formData.agreeTerms) {
+      newErrors.agreeTerms = 'You must agree to the terms';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (step === 1 && userType) {
+      setStep(2);
+    } else if (step === 2 && validateStep2()) {
+      setStep(3);
+    }
+  };
+
+  const handleBack = () => {
+    setStep(prev => prev - 1);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateStep3()) return;
+    
+    setIsLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setIsLoading(false);
+    
+    console.log('Registration submitted:', { userType, ...formData });
+  };
+
+  const selectedType = userTypes.find(t => t.id === userType);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+  <div className="w-full lg:w-7/12 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-linear-to-br from-slate-50 via-white to-amber-50 overflow-y-auto">
+    <div className="w-full max-w-full">
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-indigo-900 rounded-xl flex items-center justify-center">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+              </svg>
+            </div>
+            <span className="text-xl font-bold text-gray-900">LegalConnect</span>
+          </div>
+
+          {/* Progress Steps */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              {[1, 2, 3].map((s) => (
+                <React.Fragment key={s}>
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm transition-all duration-300 ${
+                    step >= s 
+                      ? 'bg-[#142768] text-white' 
+                      : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    {step > s ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : s}
+                  </div>
+                  {s < 3 && (
+                    <div className={`flex-1 h-1 mx-2 rounded-full transition-all duration-300 ${
+                      step > s ? 'bg-[#142768]' : 'bg-gray-200'
+                    }`}></div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Account Type</span>
+              <span>Basic Info</span>
+              <span>Details</span>
+            </div>
+          </div>
+
+          {/* Step 1: Select User Type */}
+          {step === 1 && (
+            <div className="space-y-6">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+                <p className="text-gray-600">Select your account type to get started</p>
+              </div>
+
+              <div className="grid gap-4">
+                {userTypes.map((type) => (
+                  <button
+                    key={type.id}
+                    onClick={() => setUserType(type.id)}
+                    className={`relative p-6 rounded-2xl border-2 text-left transition-all duration-300 group
+                      ${userType === type.id 
+                        ? `${type.borderColor} ${type.bgLight} shadow-lg` 
+                        : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'}`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl
+                        ${userType === type.id 
+                          ? `bg-linear-to-r ${type.color} shadow-lg` 
+                          : 'bg-gray-100 group-hover:bg-gray-200'} transition-all duration-300`}>
+                        {type.icon}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className={`font-semibold text-lg ${userType === type.id ? type.textColor : 'text-gray-900'}`}>
+                          {type.title}
+                        </h3>
+                        <p className="text-gray-500 text-sm mt-1">{type.description}</p>
+                      </div>
+                      <div
+  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300
+    ${userType === type.id ? 'border-blue-500 bg-blue-500' : 'border-gray-300'}`}
+  onClick={() => setUserType(type.id)}
+>
+  {userType === type.id && (
+    <div className="w-3 h-3 rounded-full bg-white"></div>
+  )}
+</div>
+
+                    </div>
+
+                    {/* Feature tags */}
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {type.id === 'client' && (
+                        <>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Book Appointments</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Track Cases</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Secure Messaging</span>
+                </>
+                      )}
+                      {type.id === 'lawyer' && (
+                        <>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Manage Schedule</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Client Portal</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Billing Tools</span>
+                        </>
+                      )}
+                      {type.id === 'admin' && (
+                        <>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">User Management</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Analytics</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">System Control</span>
+                        </>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={handleNext}
+                disabled={!userType}
+                className="w-full py-4 bg-[#142768] text-white font-semibold rounded-xl
+                  hover:shadow-lg  
+                 disabled:cursor-not-allowed disabled:hover:translate-y-0
+                  flex items-center justify-center gap-2"
+              >
+                Continue
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+
+              {/* Sign In Link */}
+              <p className="text-center text-gray-600">
+                Already have an account?{' '}
+                <a href="#" className="text-[#142768] hover:text-white font-semibold hover:underline">
+                  Sign In
+                </a>
+              </p>
+            </div>
+          )}
+
+          {/* Step 2: Basic Information */}
+          {step === 2 && (
+            <div className="space-y-6">
+              <div className="text-center mb-8">
+                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4 ${selectedType?.bgLight} ${selectedType?.textColor}`}>
+                  <span>{selectedType?.icon}</span>
+                  {selectedType?.title} Registration
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Basic Information</h2>
+                <p className="text-gray-600">Tell us about yourself</p>
+              </div>
+
+              <form className="space-y-5">
+                {/* Name Row */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      First Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      placeholder="John"
+                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
+                        ${errors.firstName ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
+                        focus:outline-none focus:ring-2 focus:border-transparent`}
+                    />
+                    {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Last Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      placeholder="Doe"
+                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
+                        ${errors.lastName ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
+                        focus:outline-none focus:ring-2 focus:border-transparent`}
+                    />
+                    {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="john@example.com"
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-all duration-300
+                        ${errors.email ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
+                        focus:outline-none focus:ring-2 focus:border-transparent`}
+                    />
+                  </div>
+                  {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="+1 (555) 000-0000"
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-all duration-300
+                        ${errors.phone ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
+                        focus:outline-none focus:ring-2 focus:border-transparent`}
+                    />
+                  </div>
+                  {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+                </div>
+
+                {/* Navigation Buttons */}
+                <div className="flex gap-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    className="flex-1 py-3.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl
+                      hover:bg-gray-50 hover:border-gray-300 transition-all duration-300
+                      flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="flex-1 py-3.5 bg-[#142768] text-white font-semibold rounded-xl
+                      hover:shadow-lg hover:shadow-indigo-200 transition-all duration-300
+                      flex items-center justify-center gap-2"
+                  >
+                    Continue
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Step 3: Role-Specific Details */}
+          {step === 3 && (
+            <div className="space-y-6">
+              <div className="text-center mb-8">
+                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4 ${selectedType?.bgLight} ${selectedType?.textColor}`}>
+                  <span>{selectedType?.icon}</span>
+                  {selectedType?.title} Details
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                  {userType === 'lawyer' && 'Professional Information'}
+                  {userType === 'admin' && 'Admin Verification'}
+                  {userType === 'client' && 'Personal Details'}
+                </h2>
+                <p className="text-gray-600">Complete your profile to get started</p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* LAWYER FIELDS */}
+                {userType === 'lawyer' && (
+                  <>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Bar Number <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="barNumber"
+                          value={formData.barNumber}
+                          onChange={handleChange}
+                          placeholder="e.g., NY12345"
+                          className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
+                            ${errors.barNumber ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-amber-500'}
+                            focus:outline-none focus:ring-2 focus:border-transparent`}
+                        />
+                        {errors.barNumber && <p className="mt-1 text-sm text-red-600">{errors.barNumber}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Years of Experience <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          name="yearsOfExperience"
+                          value={formData.yearsOfExperience}
+                          onChange={handleChange}
+                          className={`w-full px-4 py-3 rounded-xl border bg-white transition-all duration-300
+                            ${errors.yearsOfExperience ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-amber-500'}
+                            focus:outline-none focus:ring-2 focus:border-transparent`}
+                        >
+                          <option value="">Select experience</option>
+                          <option value="0-2">0-2 years</option>
+                          <option value="3-5">3-5 years</option>
+                          <option value="6-10">6-10 years</option>
+                          <option value="11-15">11-15 years</option>
+                          <option value="15+">15+ years</option>
+                        </select>
+                        {errors.yearsOfExperience && <p className="mt-1 text-sm text-red-600">{errors.yearsOfExperience}</p>}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Law Firm (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        name="lawFirm"
+                        value={formData.lawFirm}
+                        onChange={handleChange}
+                        placeholder="Enter your law firm name"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-amber-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
+                        Specializations <span className="text-red-500">*</span>
+                      </label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {specializations.map((spec) => (
+                          <label
+                            key={spec}
+                            className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all duration-200
+                              ${formData.specialization.includes(spec) 
+                                ? 'border-amber-500 bg-amber-50 text-white' 
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
+                          >
+                            <input
+                              type="checkbox"
+                              name="specialization"
+                              value={spec}
+                              checked={formData.specialization.includes(spec)}
+                              onChange={handleChange}
+                              className="sr-only"
+                            />
+                            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center
+                              ${formData.specialization.includes(spec) ? 'border-amber-500 bg-amber-500' : 'border-gray-300'}`}>
+                              {formData.specialization.includes(spec) && (
+                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </div>
+                            <span className="text-sm">{spec}</span>
+                          </label>
+                        ))}
+                      </div>
+                      {errors.specialization && <p className="mt-2 text-sm text-red-600">{errors.specialization}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        License Document (Optional)
+                      </label>
+                      <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-amber-400 transition-colors duration-300">
+                        <input
+                          type="file"
+                          name="licenseDocument"
+                          onChange={handleChange}
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="hidden"
+                          id="license-upload"
+                        />
+                        <label htmlFor="license-upload" className="cursor-pointer">
+                          <svg className="w-10 h-10 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <p className="text-gray-600 text-sm">
+                            <span className="text-amber-600 font-medium">Click to upload</span> or drag and drop
+                          </p>
+                          <p className="text-gray-400 text-xs mt-1">PDF, JPG, PNG up to 10MB</p>
+                        </label>
+                        {formData.licenseDocument && (
+                          <p className="mt-2 text-sm text-green-600">{formData.licenseDocument.name}</p>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* ADMIN FIELDS */}
+                {userType === 'admin' && (
+                  <>
+                    <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-4">
+                      <div className="flex items-start gap-3">
+                        <svg className="w-5 h-5 text-purple-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                        <div>
+                          <p className="text-purple-800 font-medium text-sm">Admin Verification Required</p>
+                          <p className="text-purple-600 text-sm mt-1">You need a valid admin code provided by the system administrator to register as an admin.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Admin Verification Code <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                          </svg>
+                        </div>
+                        <input
+                          type="text"
+                          name="adminCode"
+                          value={formData.adminCode}
+                          onChange={handleChange}
+                          placeholder="Enter admin code"
+                          className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-all duration-300
+                            ${errors.adminCode ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-purple-500'}
+                            focus:outline-none focus:ring-2 focus:border-transparent`}
+                        />
+                      </div>
+                      {errors.adminCode && <p className="mt-1 text-sm text-red-600">{errors.adminCode}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Department <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="department"
+                        value={formData.department}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 rounded-xl border bg-white transition-all duration-300
+                          ${errors.department ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-purple-500'}
+                          focus:outline-none focus:ring-2 focus:border-transparent`}
+                      >
+                        <option value="">Select department</option>
+                        {departments.map((dept) => (
+                          <option key={dept} value={dept}>{dept}</option>
+                        ))}
+                      </select>
+                      {errors.department && <p className="mt-1 text-sm text-red-600">{errors.department}</p>}
+                    </div>
+
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h4 className="font-medium text-gray-900 mb-3">Admin Privileges Include:</h4>
+                      <ul className="space-y-2">
+                        {[
+                          'User account management',
+                          'Lawyer verification & approval',
+                          'Platform analytics & reports',
+                          'Content moderation',
+                          'System configuration'
+                        ].map((item, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                            <svg className="w-4 h-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+
+                {/* CLIENT FIELDS */}
+                {userType === 'client' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Date of Birth <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        name="dateOfBirth"
+                        value={formData.dateOfBirth}
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
+                          ${errors.dateOfBirth ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
+                          focus:outline-none focus:ring-2 focus:border-transparent`}
+                      />
+                      {errors.dateOfBirth && <p className="mt-1 text-sm text-red-600">{errors.dateOfBirth}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Street Address <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        placeholder="123 Main Street, Apt 4B"
+                        className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
+                          ${errors.address ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
+                          focus:outline-none focus:ring-2 focus:border-transparent`}
+                      />
+                      {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
+                    </div>
+
+                    <div className="grid sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          City <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="city"
+                          value={formData.city}
+                          onChange={handleChange}
+                          placeholder="New York"
+                          className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
+                            ${errors.city ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
+                            focus:outline-none focus:ring-2 focus:border-transparent`}
+                        />
+                        {errors.city && <p className="mt-1 text-sm text-red-600">{errors.city}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          State <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="state"
+                          value={formData.state}
+                          onChange={handleChange}
+                          placeholder="NY"
+                          className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
+                            ${errors.state ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
+                            focus:outline-none focus:ring-2 focus:border-transparent`}
+                        />
+                        {errors.state && <p className="mt-1 text-sm text-red-600">{errors.state}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          ZIP Code
+                        </label>
+                        <input
+                          type="text"
+                          name="zipCode"
+                          value={formData.zipCode}
+                          onChange={handleChange}
+                          placeholder="10001"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-indigo-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-indigo-50 rounded-xl p-4">
+                      <h4 className="font-medium text-indigo-900 mb-3">As a Client, You Can:</h4>
+                      <ul className="space-y-2">
+                        {[
+                          'Browse and search verified lawyers',
+                          'Book appointments online',
+                          'Securely message your attorney',
+                          'Track your case progress',
+                          'Access legal documents'
+                        ].map((item, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-sm text-indigo-70">
+                            <svg className="w-4 h-4 text-indigo-500" fill="currentColor" vindigoox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+
+                {/* Terms & Conditions */}
+                <div className="pt-4 border-t border-gray-200">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="agreeTerms"
+                      checked={formData.agreeTerms}
+                      onChange={handleChange}
+                      className="w-5 h-5 mt-0.5 text-indigo-500 focus:ring-indigo-500 border-gray-300 rounded"
+                    />
+                    <span className="text-sm text-gray-600">
+                      I agree to the{' '}
+                      <a href="#" className="text-indigo-600 hover:underline font-medium">Terms of Service</a>
+                      {' '}and{' '}
+                      <a href="#" className="text-indigo-600 hover:underline font-medium">Privacy Policy</a>.
+                      {userType === 'lawyer' && (
+                        <span> I also confirm that all professional information provided is accurate and verifiable.</span>
+                      )}
+                    </span>
+                  </label>
+                  {errors.agreeTerms && <p className="mt-2 text-sm text-red-600">{errors.agreeTerms}</p>}
+                </div>
+
+                {/* Navigation Buttons */}
+                <div className="flex gap-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    className="flex-1 py-3.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl
+                      hover:bg-gray-50 hover:border-gray-300 transition-all duration-300
+                      flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className={`flex-1 py-3.5 font-semibold rounded-xl transition-all duration-300
+                      flex items-center justify-center gap-2
+                      ${userType === 'client' 
+                        ? 'bg-[#142768] ' 
+                        : userType === 'admin'
+                        ? 'bg-[#142768] '
+                        : 'bg-[#142768] '}
+                      text-white hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed`}
+                  >
+                    {isLoading ? (
+                      <>
+                        <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Creating Account...
+                      </>
+                    ) : (
+                      <span className="inline-flex items-center text-white bg-[#142768] py-3.5 px-3.5 space-x-2 rounded">
+  Create Account
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+  </svg>
+</span>
+
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Security Notice */}
+          <div className="mt-8 flex items-center justify-center gap-2 text-xs text-gray-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span>Your information is protected and secure</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SignUp;

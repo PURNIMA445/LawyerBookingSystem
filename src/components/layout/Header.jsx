@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
 
 const Navbar = () => {
     const [toggle, setToggle] = useState(false);
+    const location = useLocation(); // <-- Track current route
 
     const handleToggle = () => {
         setToggle(!toggle);
@@ -25,10 +26,10 @@ const Navbar = () => {
                 {/* Main Navbar Row */}
                 <div className="flex items-center justify-between lg:justify-center relative">
 
-                    {/* Logo - Center on Mobile, Left on Desktop */}
+                    {/* Logo */}
                     <Link
                         to="/"
-                        className="text-xl font-bold tracking-wide text-orange-600 absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0"
+                        className="text-xl font-bold tracking-wide text-[#142768] absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0"
                     >
                         LEGALCONNECT
                     </Link>
@@ -39,14 +40,18 @@ const Navbar = () => {
                             <Link
                                 key={link.to}
                                 to={link.to}
-                                className="text-gray-700 hover:text-amber-600 font-medium transition-colors"
+                                className={`text-gray-700 font-medium transition-colors pb-2 ${
+                                    location.pathname === link.to
+                                        ? "border-b-4 border-[#142768] text-[#142768]"
+                                        : "border-b-4 border-transparent hover:border-[#142768] hover:text-[#142768]"
+                                }`}
                             >
                                 {link.label}
                             </Link>
                         ))}
                         <Link
                             to="/login"
-                            className="bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-6 py-2 rounded-md transition-all"
+                            className="bg-[#142768] text-white px-6 py-2 rounded-md transition-all"
                         >
                             Login
                         </Link>
@@ -54,10 +59,10 @@ const Navbar = () => {
 
                     {/* Spacer for mobile */}
                     <div className="lg:hidden w-11"></div>
-                    {/* Hamburger - Left Side on Mobile */}
+                    {/* Hamburger */}
                     <div
                         onClick={handleToggle}
-                        className="lg:hidden cursor-pointer p-2 rounded-md text-gray-800 hover:text-amber-600 hover:bg-gray-100 transition-all duration-200 active:scale-95"
+                        className="lg:hidden cursor-pointer p-2 rounded-md text-gray-800 hover:text-[#142768] hover:bg-gray-100 transition-all duration-200 active:scale-95"
                     >
                         {toggle ? (
                             <IoMdClose className="w-7 h-7" />
@@ -76,7 +81,11 @@ const Navbar = () => {
                                 <Link
                                     key={link.to}
                                     to={link.to}
-                                    className="text-gray-700 hover:text-amber-600 hover:bg-gray-50 font-medium py-2 px-4 rounded-md transition-colors"
+                                    className={`text-gray-700 font-medium py-2 px-4 rounded-md transition-colors ${
+                                        location.pathname === link.to
+                                            ? "bg-blue-100 text-[#142768]"
+                                            : "hover:bg-gray-50 hover:text-[#142768]"
+                                    }`}
                                     onClick={handleToggle}
                                 >
                                     {link.label}
@@ -85,7 +94,7 @@ const Navbar = () => {
 
                             <Link
                                 to="/login"
-                                className="mt-2 bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white py-2 px-4 rounded-md text-center font-medium transition-all"
+                                className="mt-2 bg-[#142768]  text-white py-2 px-4 rounded-md text-center font-medium transition-all"
                                 onClick={handleToggle}
                             >
                                 Login

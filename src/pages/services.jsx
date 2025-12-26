@@ -78,11 +78,15 @@ const Services = () => {
      
 
       {/* Hero Section */}
-      <section className="bg-slate-800 text-white py-16">
+      <section className="  py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Our Legal Services</h2>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            Providing expert legal representation with integrity, dedication, and proven results
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Our
+              <span className="block text-transparent bg-clip-text bg-[#142768]">
+                Legal Services             </span>
+            </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          Delivering expert legal representation with integrity, dedication, and a track record of proven results
           </p>
         </div>
       </section>
@@ -116,15 +120,15 @@ const Services = () => {
       </section>
 
       {/* Testimonials Carousel */}
-      <section className="py-16 bg-slate-500">
+      <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-black text-center mb-12">
             Client Testimonials
           </h2>
           
           <div className="max-w-4xl mx-auto relative">
             <div className="bg-white rounded-xl shadow-2xl p-8 md:p-12">
-              <div className="text-amber-500 text-6xl mb-4">"</div>
+             
               <p className="text-slate-700 text-lg md:text-xl mb-6 italic">
                 {testimonials[currentSlide].text}
               </p>
@@ -168,7 +172,7 @@ const Services = () => {
                   key={index}
                   onClick={() => setCurrentSlide(index)}
                   className={`w-3 h-3 rounded-full transition-colors ${
-                    currentSlide === index ? 'bg-amber-500' : 'bg-slate-400'
+                    currentSlide === index ? 'bg-indigo-500' : 'bg-slate-400'
                   }`}
                 />
               ))}

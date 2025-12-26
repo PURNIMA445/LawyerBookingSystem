@@ -58,7 +58,7 @@ export default function TermsAndConditions() {
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center gap-3">
-            <Scale className="w-8 h-8 text-blue-600" />
+            <Scale className="w-8 h-8 text-[#142768]" />
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Terms & Conditions</h1>
               <p className="text-sm text-slate-600 mt-1">Lawyer Appointment System</p>
@@ -73,7 +73,7 @@ export default function TermsAndConditions() {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-start gap-4">
             <div className="shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <FileText className="w-6 h-6 text-blue-600" />
+              <FileText className="w-6 h-6 text-[#142768]" />
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-semibold text-slate-900 mb-2">Welcome</h2>
@@ -97,7 +97,7 @@ export default function TermsAndConditions() {
                 className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="shrink-0 text-blue-600">
+                  <div className="shrink-0 text-[#142768]">
                     {section.icon}
                   </div>
                   <h3 className="text-lg font-semibold text-slate-900">
@@ -121,7 +121,7 @@ export default function TermsAndConditions() {
                 } overflow-hidden`}
               >
                 <div className="px-6 pb-4 pt-2">
-                  <p className="text-slate-700 leading-relaxed border-l-4 border-blue-200 pl-4">
+                  <p className="text-slate-700 leading-relaxed border-l-4 border-blue-900 pl-4">
                     {section.content}
                   </p>
                 </div>
@@ -150,7 +150,7 @@ export default function TermsAndConditions() {
               type="checkbox"
               checked={accepted}
               onChange={(e) => setAccepted(e.target.checked)}
-              className="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              className="mt-1 w-5 h-5 text-[#142768] rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
             />
             <span className="text-slate-700 leading-relaxed">
               I have read, understood, and agree to be bound by these Terms and Conditions. 
