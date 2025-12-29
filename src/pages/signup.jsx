@@ -189,7 +189,7 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-  <div className="w-full lg:w-7/12 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-linear-to-br from-slate-50 via-white to-amber-50 overflow-y-auto">
+  <div className="w-full lg:w-7/12 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-linear-to-br from-slate-50 via-white to-indigo-50 overflow-y-auto">
     <div className="w-full max-w-full">
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center gap-3 mb-6">
@@ -489,7 +489,7 @@ const SignUp = () => {
                           onChange={handleChange}
                           placeholder="e.g., NY12345"
                           className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
-                            ${errors.barNumber ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-amber-500'}
+                            ${errors.barNumber ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
                             focus:outline-none focus:ring-2 focus:border-transparent`}
                         />
                         {errors.barNumber && <p className="mt-1 text-sm text-red-600">{errors.barNumber}</p>}
@@ -503,7 +503,7 @@ const SignUp = () => {
                           value={formData.yearsOfExperience}
                           onChange={handleChange}
                           className={`w-full px-4 py-3 rounded-xl border bg-white transition-all duration-300
-                            ${errors.yearsOfExperience ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-amber-500'}
+                            ${errors.yearsOfExperience ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
                             focus:outline-none focus:ring-2 focus:border-transparent`}
                         >
                           <option value="">Select experience</option>
@@ -527,7 +527,7 @@ const SignUp = () => {
                         value={formData.lawFirm}
                         onChange={handleChange}
                         placeholder="Enter your law firm name"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-amber-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-indigo-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
                       />
                     </div>
 
@@ -541,7 +541,7 @@ const SignUp = () => {
                             key={spec}
                             className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all duration-200
                               ${formData.specialization.includes(spec) 
-                                ? 'border-amber-500 bg-amber-50 text-white' 
+                                ? 'border-indigo-500 bg-indigo-50 text-white' 
                                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
                           >
                             <input
@@ -553,7 +553,7 @@ const SignUp = () => {
                               className="sr-only"
                             />
                             <div className={`w-4 h-4 rounded border-2 flex items-center justify-center
-                              ${formData.specialization.includes(spec) ? 'border-amber-500 bg-amber-500' : 'border-gray-300'}`}>
+                              ${formData.specialization.includes(spec) ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300'}`}>
                               {formData.specialization.includes(spec) && (
                                 <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -571,7 +571,7 @@ const SignUp = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         License Document (Optional)
                       </label>
-                      <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-amber-400 transition-colors duration-300">
+                      <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-indigo-400 transition-colors duration-300">
                         <input
                           type="file"
                           name="licenseDocument"
@@ -585,7 +585,7 @@ const SignUp = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                           </svg>
                           <p className="text-gray-600 text-sm">
-                            <span className="text-amber-600 font-medium">Click to upload</span> or drag and drop
+                            <span className="text-indigo-600 font-medium">Click to upload</span> or drag and drop
                           </p>
                           <p className="text-gray-400 text-xs mt-1">PDF, JPG, PNG up to 10MB</p>
                         </label>
