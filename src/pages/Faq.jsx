@@ -154,7 +154,7 @@ const FAQ = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-amber-50">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50">
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
         {/* Background Pattern */}
@@ -243,7 +243,7 @@ const FAQ = () => {
                     >
                       <span className={`w-2 h-2 rounded-full ${activeCategory === idx ? 'bg-white' : 'bg-indigo-500'}`}></span>
                       {category.category}
-                      <span className={`ml-auto text-sm ${activeCategory === idx ? 'text-amber-100' : 'text-gray-400'}`}>
+                      <span className={`ml-auto text-sm ${activeCategory === idx ? 'text-indigo-100' : 'text-gray-400'}`}>
                         {category.questions.length}
                       </span>
                     </button>
