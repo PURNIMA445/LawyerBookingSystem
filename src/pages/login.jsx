@@ -2,15 +2,43 @@
 import React, { useState } from 'react';
 import { BiSolidShow } from "react-icons/bi";
 import { GrHide } from "react-icons/gr";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { keepLoggedIn, login } from '../api/userApi';
 const Login = () => {
   const [loginType, setLoginType] = useState('client');
   const [showPassword, setShowPassword] = useState(false);
 
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const navigate = useNavigate()
+
+  const handleLogin = e => {
+    e.preventDefault()
+    login(email, password)
+      .then(data => {
+        if(data.error){
+          console.log(data.error)
+        }
+        else{
+          keepLoggedIn(data)
+          if(data.role === 'admin'){
+            navigate('/admin/dashboard')
+          }
+          else if(data.role === 'lawyer'){
+            navigate('/lawyer/dashboard')
+          }
+          else{
+            navigate('/profile')
+          }
+        }
+      })
+      .catch(error => console.log(error))
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f0f4ff]">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 sm:p-10">
-        
+
         {/* Header */}
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-[#142768] mb-2">Welcome Back</h2>
@@ -24,8 +52,8 @@ const Login = () => {
               key={type}
               onClick={() => setLoginType(type)}
               className={`flex-1 py-2 text-sm font-medium transition-all
-                ${loginType === type 
-                  ? 'bg-[#142768] text-white shadow-md' 
+                ${loginType === type
+                  ? 'bg-[#142768] text-white shadow-md'
                   : 'text-[#142768]/70 hover:text-[#142768]'}`}
             >
               {type === 'client' ? '👤 Client' : '⚖️ Lawyer'}
@@ -41,6 +69,7 @@ const Login = () => {
               type="email"
               placeholder="you@example.com"
               className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              onChange={e => setEmail(e.target.value)}
             />
           </div>
 
@@ -51,13 +80,14 @@ const Login = () => {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••"
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                onChange={e => setPassword(e.target.value)}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-900 hover:text-gray-800"
               >
-                {showPassword ? <GrHide className='w-3'/> : <BiSolidShow />}
+                {showPassword ? <GrHide className='w-3' /> : <BiSolidShow />}
               </button>
             </div>
           </div>
@@ -73,6 +103,7 @@ const Login = () => {
           <button
             type="submit"
             className="w-full py-3 bg-[#142768] text-white font-semibold rounded-xl hover:bg-blue-900 transition-all flex justify-center items-center gap-2"
+            onClick={handleLogin}
           >
             Sign In
           </button>
