@@ -9,7 +9,7 @@ import Contact from './pages/Contact'
 import TermsAndConditions from './pages/TermsCondition'
 import LandingPage from './pages/LandingPage'
 import Login from './pages/login'
-
+import LearnMore from './pages/ServiceDetailsPage'
 import SignUp from './pages/signup'
 import AdminRoutes from './protectedRoutes/AdminRoutes'
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -17,6 +17,7 @@ import ClientRoutes from './protectedRoutes/ClientRoutes'
 import Profile from './pages/clients/Profile'
 import LawyerRoutes from './protectedRoutes/LawyerRoutes'
 import LawyerDashboard from './pages/lawyer/LawyerDashboard'
+import ServiceDetailsPage from './pages/ServiceDetailsPage'
 const MyRoute = () => {
   return (
     <BrowserRouter>
@@ -31,8 +32,10 @@ const MyRoute = () => {
           <Route path='/terms' element={<TermsAndConditions />} />
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<SignUp />} />
+          <Route path="/services/:id" element={<ServiceDetailsPage />} />
 
           <Route path='admin' element={<AdminRoutes />}>
+
             <Route path='dashboard' element={<AdminDashboard />} />
           </Route>
           <Route path='/' element={<ClientRoutes />}>

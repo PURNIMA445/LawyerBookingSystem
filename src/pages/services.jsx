@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Scale, FileText, Users, Briefcase, Home, Building, Shield } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { servicesData } from '../data/services';
+import { Link } from "react-router-dom";
 
 const Services = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -25,39 +27,6 @@ const Services = () => {
     }
   ];
 
-  const services = [
-    {
-      icon: <Briefcase className="w-12 h-12" />,
-      title: "Corporate Law",
-      description: "Comprehensive legal solutions for businesses, including contracts, compliance, mergers, and corporate governance."
-    },
-    {
-      icon: <Home className="w-12 h-12" />,
-      title: "Family Law",
-      description: "Sensitive handling of divorce, child custody, adoption, and other family-related legal matters."
-    },
-    {
-      icon: <Building className="w-12 h-12" />,
-      title: "Real Estate Law",
-      description: "Expert guidance on property transactions, disputes, zoning issues, and real estate contracts."
-    },
-    {
-      icon: <Shield className="w-12 h-12" />,
-      title: "Criminal Defense",
-      description: "Aggressive defense representation for various criminal charges with a focus on protecting your rights."
-    },
-    {
-      icon: <FileText className="w-12 h-12" />,
-      title: "Estate Planning",
-      description: "Strategic planning for wills, trusts, probate, and estate administration to secure your legacy."
-    },
-    {
-      icon: <Users className="w-12 h-12" />,
-      title: "Civil Litigation",
-      description: "Skilled advocacy in civil disputes, including personal injury, contract disputes, and business litigation."
-    }
-  ];
-
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % testimonials.length);
@@ -75,18 +44,18 @@ const Services = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-50 to-slate-100">
-     
+
 
       {/* Hero Section */}
       <section className="  py-16">
         <div className="container mx-auto px-4 text-center">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Our
-              <span className="block text-transparent bg-clip-text bg-[#142768]">
-                Legal Services             </span>
-            </h1>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Our
+            <span className="block text-transparent bg-clip-text bg-[#142768]">
+              Legal Services             </span>
+          </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          Delivering expert legal representation with integrity, dedication, and a track record of proven results
+            Delivering expert legal representation with integrity, dedication, and a track record of proven results
           </p>
         </div>
       </section>
@@ -95,24 +64,30 @@ const Services = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <div 
+            {servicesData.map((service, index) => (
+              <div
                 key={index}
                 className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-shadow duration-300 border border-slate-200"
               >
                 <div className="text-blue-900 mb-4">
-                  {service.icon}
+                  <service.icon className="w-10 h-10" />
                 </div>
+
                 <h3 className="text-2xl font-bold text-slate-900 mb-3">
                   {service.title}
                 </h3>
                 <p className="text-slate-600 leading-relaxed">
                   {service.description}
                 </p>
-                <button className="mt-6 text-blue-900 hover:text-amber-700 font-semibold flex items-center group">
+
+                {/* ✅ Updated Learn More Link */}
+                <Link
+                  to={`/services/${service.id}`}
+                  className="mt-6 text-blue-900 font-semibold flex items-center group hover:underline"
+                >
                   Learn More
                   <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                </button>
+                </Link>
               </div>
             ))}
           </div>
@@ -125,10 +100,10 @@ const Services = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-black text-center mb-12">
             Client Testimonials
           </h2>
-          
+
           <div className="max-w-4xl mx-auto relative">
             <div className="bg-white rounded-xl shadow-2xl p-8 md:p-12">
-             
+
               <p className="text-slate-700 text-lg md:text-xl mb-6 italic">
                 {testimonials[currentSlide].text}
               </p>
@@ -171,9 +146,8 @@ const Services = () => {
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    currentSlide === index ? 'bg-indigo-500' : 'bg-slate-400'
-                  }`}
+                  className={`w-3 h-3 rounded-full transition-colors ${currentSlide === index ? 'bg-indigo-500' : 'bg-slate-400'
+                    }`}
                 />
               ))}
             </div>
@@ -181,9 +155,9 @@ const Services = () => {
         </div>
       </section>
 
-    
 
-      
+
+
     </div>
   );
 };
