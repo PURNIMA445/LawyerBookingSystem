@@ -1,7 +1,7 @@
 // SignUp.jsx
 import React, { useState } from "react";
 import { registerUser } from "../api/userApi";
-
+import { Link } from "react-router-dom";
 const SignUp = () => {
   const [step, setStep] = useState(1);
   const [userType, setUserType] = useState("");
@@ -70,7 +70,7 @@ const SignUp = () => {
       borderColor: "border-indigo-500",
     },
   ];
-
+ // Lawyer specific
   const specializations = [
     "Family Law",
     "Criminal Defense",
@@ -85,7 +85,7 @@ const SignUp = () => {
     "Civil Rights",
     "Environmental Law",
   ];
-
+//admin specific
   const departments = [
     "User Management",
     "Lawyer Verification",
@@ -476,12 +476,12 @@ const SignUp = () => {
               {/* Sign In Link */}
               <p className="text-center text-gray-600">
                 Already have an account?{" "}
-                <a
-                  href="#"
-                  className="text-[#142768] hover:text-white font-semibold hover:underline"
+                <Link
+                  to="/login"
+                  className="text-[#142768] hover:text-black font-semibold hover:underline"
                 >
                   Sign In
-                </a>
+                </Link>
               </p>
             </div>
           )}

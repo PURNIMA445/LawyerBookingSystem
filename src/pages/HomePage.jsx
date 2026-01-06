@@ -38,8 +38,8 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
 
-      {/* Hero Section */}
-      <div className="bg-[#182347] text-white">
+      {/* Hero Section 182347*/}
+      <div className="bg-linear-to-r from-indigo-500 to-[#182347] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
             Professional Legal Consultation

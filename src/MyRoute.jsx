@@ -9,7 +9,7 @@ import Contact from './pages/Contact'
 import TermsAndConditions from './pages/TermsCondition'
 import LandingPage from './pages/LandingPage'
 import Login from './pages/login'
-import LearnMore from './pages/ServiceDetailsPage'
+
 import SignUp from './pages/signup'
 import AdminRoutes from './protectedRoutes/AdminRoutes'
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -18,8 +18,13 @@ import Profile from './pages/clients/Profile'
 import LawyerRoutes from './protectedRoutes/LawyerRoutes'
 import LawyerDashboard from './pages/lawyer/LawyerDashboard'
 import ServiceDetailsPage from './pages/ServiceDetailsPage'
+import Dashboard from './pages/Dashboard'
+import ClientProfile from './pages/ClientProfile'
+import LawyerProfile from './pages/LawyerProfile'
+
 const MyRoute = () => {
   return (
+   
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Layout />}>
@@ -33,7 +38,7 @@ const MyRoute = () => {
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<SignUp />} />
           <Route path="/services/:id" element={<ServiceDetailsPage />} />
-
+          
           <Route path='admin' element={<AdminRoutes />}>
 
             <Route path='dashboard' element={<AdminDashboard />} />
@@ -45,9 +50,13 @@ const MyRoute = () => {
             <Route path='dashboard' element={<LawyerDashboard />} />
           </Route>
         </Route>
+        <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/clientprofile' element={<ClientProfile />} />
+        <Route path='/lawyerprofile' element={<LawyerProfile />} />
       </Routes>
 
     </BrowserRouter>
+    
   )
 }
 

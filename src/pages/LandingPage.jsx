@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Shield, Users, ArrowRight, CheckCircle, Clock, Award, MessageSquare } from 'lucide-react';
-
+import { Link } from "react-router-dom";
 export default function LandingPage() {
     const [activeFeature, setActiveFeature] = useState(0);
 
@@ -42,11 +42,12 @@ export default function LandingPage() {
                     Connect with top-rated attorneys instantly. Book consultations, manage cases, and get expert legal advice all in one platform.
                 </p>
                 <div className="flex justify-center gap-4 flex-wrap">
-                    <button className="px-8 py-4 
+                    <Link to='/signup' className="px-8 py-4 
                     bg-[#142768] text-white rounded-full font-semibold hover:scale-105 transition-transform flex items-center gap-2">
-                        Book Free Consultation
-                        <ArrowRight className="w-5 h-5" />
-                    </button>
+
+                        Book Free Consultation<ArrowRight className="w-5 h-5" />
+                        
+                    </Link>
                     <button className="px-8 py-4 bg-white border border-gray-300 rounded-full hover:bg-gray-100 transition">
                         Watch Demo
                     </button>
@@ -86,7 +87,7 @@ export default function LandingPage() {
                     Simple, Fast, <span className="bg-[#142768] bg-clip-text text-transparent">Effective</span>
                 </h2>
                 <div className="grid md:grid-cols-3 gap-6">
-                    {[{icon: MessageSquare, title:"Describe Your Case"}, {icon: Users, title:"Get Matched"}, {icon: Calendar, title:"Book & Meet"}].map((step, idx) => (
+                    {[{ icon: MessageSquare, title: "Describe Your Case" }, { icon: Users, title: "Get Matched" }, { icon: Calendar, title: "Book & Meet" }].map((step, idx) => (
                         <div key={idx} className="p-6 bg-white rounded-2xl border border-gray-200 hover:bg-linear-to-r hover:from-blue-100 hover:to-purple-200 hover:scale-105 transition transform cursor-pointer">
                             <div className="mb-4 p-4 bg-blue-50 rounded-xl inline-block">
                                 <step.icon className="w-8 h-8 text-indigo-900" />
@@ -103,7 +104,7 @@ export default function LandingPage() {
                 <div className="grid md:grid-cols-4 gap-4">
                     {specialties.map((spec, idx) => (
                         <div key={idx} className="p-6 bg-white rounded-2xl border border-gray-200 hover:bg-linear-to-r hover:from-blue-100 hover:to-purple-200 hover:scale-105 transition transform text-center cursor-pointer">
-                            <Award className="w-8 h-8 mx-auto mb-3 text-indigo-900"/>
+                            <Award className="w-8 h-8 mx-auto mb-3 text-indigo-900" />
                             <div className="font-semibold text-gray-800">{spec}</div>
                         </div>
                     ))}
@@ -113,7 +114,7 @@ export default function LandingPage() {
             {/* CTA */}
             <section className="max-w-4xl mx-auto py-16 px-6 text-center">
                 <div className="bg-[#142768] rounded-3xl p-12 text-white">
-                    <Clock className="w-16 h-16 mx-auto mb-6"/>
+                    <Clock className="w-16 h-16 mx-auto mb-6" />
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Started?</h2>
                     <p className="mb-6">Join thousands of satisfied clients who found the legal help they needed</p>
                     <button className="px-10 py-4 bg-white text-[#142768] rounded-full font-bold hover:scale-105 transition-transform">Start Free Consultation</button>
