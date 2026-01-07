@@ -21,6 +21,7 @@ import ServiceDetailsPage from './pages/ServiceDetailsPage'
 import Dashboard from './pages/Dashboard'
 import ClientProfile from './pages/ClientProfile'
 import LawyerProfile from './pages/LawyerProfile'
+import BookAppointment from './pages/BookAppointment'
 
 const MyRoute = () => {
   return (
@@ -53,6 +54,7 @@ const MyRoute = () => {
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/clientprofile' element={<ClientProfile />} />
         <Route path='/lawyerprofile' element={<LawyerProfile />} />
+        <Route path='/bookappointment' element={<BookAppointment />} />
       </Routes>
 
     </BrowserRouter>
