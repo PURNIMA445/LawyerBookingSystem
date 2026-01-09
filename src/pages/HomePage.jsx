@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link} from 'react-router-dom';
 
 const HomePage = () => {
   const [searchData, setSearchData] = useState({
@@ -141,17 +142,25 @@ const HomePage = () => {
                 </div>
 
                 <div>
-                  <button
-                    onClick={() => handleBookAppointment(lawyer.id)}
-                    disabled={lawyer.availability !== 'Available'}
-                    className={`px-6 py-2.5 rounded font-medium transition duration-300 ${
-                      lawyer.availability === 'Available'
-                        ? 'bg-[#142768] hover:bg-indigo-700 text-white'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    Book Appointment
-                  </button>
+                <Link
+  to={lawyer.availability === 'Available' ? '/bookappointment' : '#'}
+  onClick={(e) => {
+    if (lawyer.availability !== 'Available') {
+      e.preventDefault();
+      return;
+    }
+    handleBookAppointment(lawyer.id);
+  }}
+  className={`px-6 py-2.5 rounded font-medium transition duration-300 ${
+    lawyer.availability === 'Available'
+      ? 'bg-[#142768] hover:bg-indigo-700 text-white'
+      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+  }`}
+  style={lawyer.availability !== 'Available' ? { pointerEvents: 'none' } : undefined}
+>
+  Book Appointment
+</Link>
+
                 </div>
               </div>
             </div>
