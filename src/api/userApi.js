@@ -55,9 +55,10 @@ export const login = (email, password) => {
 };
 
 export const keepLoggedIn = (data) => {
-    console.log(data)
-    localStorage.setItem('auth', JSON.stringify(data))
-}
+  localStorage.setItem("auth", JSON.stringify(data));
+  window.dispatchEvent(new Event("storage"));
+};
+
 
 export const isLoggedIn = () => {
     return (localStorage.getItem('auth') ? JSON.parse(localStorage.getItem('auth')) : false)

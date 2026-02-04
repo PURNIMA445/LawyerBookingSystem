@@ -22,6 +22,7 @@ import Dashboard from './pages/Dashboard'
 import ClientProfile from './pages/ClientProfile'
 import LawyerProfile from './pages/LawyerProfile'
 import BookAppointment from './pages/BookAppointment'
+import Lawyers from './pages/Lawyers'
 
 const MyRoute = () => {
   return (
@@ -33,6 +34,7 @@ const MyRoute = () => {
           <Route path='/home' element={<HomePage />} />
           <Route path='/aboutus' element={<Aboutus />} />
           <Route path='/services' element={<Services />} />
+          <Route path='/lawyers' element = {<Lawyers/>}/>
           <Route path='/faq' element={<FAQ />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/terms' element={<TermsAndConditions />} />

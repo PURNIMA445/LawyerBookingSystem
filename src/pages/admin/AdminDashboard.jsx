@@ -1,11 +1,8 @@
-import React from 'react'
+import React from "react";
+import Dashboard from "../Dashboard";
 
 const AdminDashboard = () => {
-  return (
-    <div className='h-screen flex justify-evenly items-center'>
-        This is Admin Dashboard. This page is under construction.
-    </div>
-  )
-}
+  return <Dashboard />;
+};
 
-export default AdminDashboard
+export default AdminDashboard;
