@@ -13,42 +13,50 @@ export default function TermsAndConditions() {
     {
       title: "Acceptance of Terms",
       icon: <FileText className="w-5 h-5" />,
-      content: "By accessing and using the Lawyer Appointment System, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you must not use our services."
+      content:
+        "By accessing and using LegalConnect, you confirm that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use our services."
     },
     {
       title: "Services Provided",
       icon: <Scale className="w-5 h-5" />,
-      content: "Our platform facilitates the scheduling of appointments between clients and licensed attorneys. We provide a booking interface, calendar management, and communication tools. We do not provide legal advice directly and are not responsible for the legal services rendered by attorneys."
+      content:
+        "LegalConnect is a platform that helps clients in Nepal connect with lawyers and request appointments. We provide tools for booking requests, fee negotiation, appointment history, and communication. We do not provide legal advice directly and are not responsible for the legal services delivered by lawyers."
     },
     {
       title: "User Responsibilities",
       icon: <Shield className="w-5 h-5" />,
-      content: "Users must provide accurate and current information when creating accounts and booking appointments. You are responsible for maintaining the confidentiality of your account credentials. Any activities conducted under your account are your responsibility. False or misleading information may result in account termination."
+      content:
+        "Users must provide accurate and current information while creating accounts and requesting appointments. You are responsible for keeping your account credentials secure. Any activity performed using your account is your responsibility. Misuse, false information, or fraudulent activity may result in account suspension or termination."
     },
     {
       title: "Appointment Policies",
       icon: <AlertCircle className="w-5 h-5" />,
-      content: "Appointments must be cancelled at least 24 hours in advance. Late cancellations or no-shows may result in cancellation fees as determined by the individual attorney. Rescheduling is subject to attorney availability. Virtual appointments require stable internet connection and appropriate video conferencing setup."
+      content:
+        "Appointments are requests and may require confirmation by the lawyer. Clients and lawyers can negotiate the fee before final confirmation. If you need to cancel or reschedule, please do so as early as possible. Late cancellations or repeated no-shows may impact your ability to book future appointments. Online/virtual meetings require stable internet connectivity."
     },
     {
       title: "Payment and Fees",
       icon: <FileText className="w-5 h-5" />,
-      content: "Payment terms are established between clients and attorneys. Our platform may charge a service fee for facilitating appointments. All fees are non-refundable except in cases of attorney cancellation or system errors. Payment information is processed securely through encrypted channels."
+      content:
+        "Fees for legal services are agreed between the client and the lawyer through the platform. Any platform service fee (if applicable) will be displayed clearly. Unless otherwise stated, payments (if collected) are non-refundable except for verified system errors or lawyer cancellations."
     },
     {
       title: "Privacy and Confidentiality",
       icon: <Shield className="w-5 h-5" />,
-      content: "We are committed to protecting your privacy and maintaining attorney-client privilege. Personal information is collected and used in accordance with our Privacy Policy. Communications through our platform are encrypted. However, users should be aware that electronic communications carry inherent security risks."
+      content:
+        "We take privacy seriously. Personal information is collected and used according to our Privacy Policy. Communications within the platform are intended to be secure. However, users should understand that digital communication can carry security risks. Lawyers are responsible for maintaining professional confidentiality and legal ethics as per applicable practices in Nepal."
     },
     {
       title: "Limitation of Liability",
       icon: <AlertCircle className="w-5 h-5" />,
-      content: "The platform is provided 'as is' without warranties of any kind. We are not liable for any legal advice, outcomes, or services provided by attorneys. Our liability is limited to the amount paid for platform services. We are not responsible for technical issues, data loss, or service interruptions beyond our reasonable control."
+      content:
+        "LegalConnect is provided on an 'as-is' basis without warranties of any kind. We are not liable for the quality of legal advice, outcomes, or services provided by lawyers. We are also not responsible for delays or issues caused by external factors (internet outages, third-party services, or events beyond our reasonable control)."
     },
     {
       title: "Termination",
       icon: <Scale className="w-5 h-5" />,
-      content: "We reserve the right to suspend or terminate accounts that violate these terms, engage in fraudulent activity, or misuse the platform. Users may terminate their accounts at any time by contacting support. Upon termination, access to scheduled appointments and account data may be restricted."
+      content:
+        "We may suspend or terminate accounts that violate these terms, misuse the platform, or engage in fraudulent activity. Users may request account termination by contacting support. Upon termination, access to appointment history and account data may be limited as required for operational and legal reasons."
     }
   ];
 
@@ -61,7 +69,7 @@ export default function TermsAndConditions() {
             <Scale className="w-8 h-8 text-[#142768]" />
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Terms & Conditions</h1>
-              <p className="text-sm text-slate-600 mt-1">Lawyer Appointment System</p>
+              <p className="text-sm text-slate-600 mt-1">LegalConnect (Nepal)</p>
             </div>
           </div>
         </div>
@@ -78,11 +86,11 @@ export default function TermsAndConditions() {
             <div className="flex-1">
               <h2 className="text-xl font-semibold text-slate-900 mb-2">Welcome</h2>
               <p className="text-slate-700 leading-relaxed">
-                Please read these Terms and Conditions carefully before using our Lawyer Appointment System. 
-                These terms govern your use of our platform and establish the legal framework for our services.
+                Please read these Terms and Conditions carefully before using LegalConnect.
+                These terms govern your use of the platform and outline responsibilities for clients and lawyers in Nepal.
               </p>
               <p className="text-sm text-slate-600 mt-3">
-                <strong>Last Updated:</strong> December 23, 2025
+                <strong>Last Updated:</strong> February 6, 2026
               </p>
             </div>
           </div>
@@ -137,9 +145,9 @@ export default function TermsAndConditions() {
             If you have any questions about these Terms and Conditions, please contact us:
           </p>
           <div className="space-y-2 text-slate-700">
-            <p><strong>Email:</strong> legal@lawyerappointments.com</p>
-            <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-            <p><strong>Address:</strong> 123 Legal Plaza, Suite 500, Legal City, LC 12345</p>
+            <p><strong>Email:</strong> support@legalconnect.com</p>
+            <p><strong>Phone:</strong> +977 9800000000</p>
+            <p><strong>Address:</strong> New Baneshwor, Kathmandu, Nepal</p>
           </div>
         </div>
 
@@ -153,9 +161,8 @@ export default function TermsAndConditions() {
               className="mt-1 w-5 h-5 text-[#142768] rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
             />
             <span className="text-slate-700 leading-relaxed">
-              I have read, understood, and agree to be bound by these Terms and Conditions. 
-              I acknowledge that by using the Lawyer Appointment System, I am entering into a 
-              legally binding agreement.
+              I have read, understood, and agree to be bound by these Terms and Conditions.
+              I acknowledge that by using LegalConnect, I am entering into a legally binding agreement.
             </span>
           </label>
           

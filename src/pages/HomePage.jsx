@@ -1,176 +1,254 @@
-import React, { useState } from "react";
-import { Link} from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { listLawyers } from "../api/lawyersApi";
 
-const HomePage = () => {
-  const [searchData, setSearchData] = useState({
-    location: "",
-    specialization: "",
-    date: ""
-  });
+const dummyLawyers = [
+  {
+    id: "d1",
+    name: "Adv. Sushil Koirala",
+    specialization: "Corporate & Company Law",
+    experience: "16 years",
+    availability: "Busy",
+  },
+  {
+    id: "d2",
+    name: "Adv. Rina Shrestha",
+    specialization: "Family & Divorce Law",
+    experience: "11 years",
+    availability: "Busy",
+  },
+  {
+    id: "d3",
+    name: "Adv. Prakash Adhikari",
+    specialization: "Criminal Defense",
+    experience: "14 years",
+    availability: "Busy",
+  },
+  {
+    id: "d4",
+    name: "Adv. Anil Thapa",
+    specialization: "Land & Property Law",
+    experience: "19 years",
+    availability: "Busy",
+  },
+  {
+    id: "d5",
+    name: "Adv. Nirmala Gurung",
+    specialization: "Labor & Employment Law",
+    experience: "9 years",
+    availability: "Busy",
+  },
+  {
+    id: "d6",
+    name: "Adv. Bikash Poudel",
+    specialization: "Banking & Financial Law",
+    experience: "13 years",
+    availability: "Busy",
+  },
+];
 
-  const lawyers = [
-    { id: 1, name: "Dr. Sarah Mitchell", specialization: "Corporate Law", experience: "15 years", availability: "Available" },
-    { id: 2, name: "James Anderson", specialization: "Criminal Defense", experience: "12 years", availability: "Available" },
-    { id: 3, name: "Maria Santos", specialization: "Family Law", experience: "10 years", availability: "Busy" },
-    { id: 4, name: "Robert Chen", specialization: "Real Estate Law", experience: "18 years", availability: "Available" },
-  ];
+const normalizeDbLawyer = (l) => {
+  const years = Number(l?.experience_years ?? 0);
+  const spec =
+    Array.isArray(l?.specialization)
+      ? l.specialization.join(", ")
+      : (l?.specialization || "General Practice");
 
-  const specializations = [
-    "Corporate Law",
-    "Criminal Defense",
-    "Family Law",
-    "Real Estate Law",
-    "Immigration Law",
-    "Tax Law",
-    "Intellectual Property",
-    "Employment Law"
-  ];
-
-  const handleSearch = () => {
-    console.log("Search Data:", searchData);
-    // Add your search API call here
+  return {
+    id: l?.lawyer_id, // numeric id from DB
+    lawyer_id: l?.lawyer_id,
+    name: l?.full_name || "Unknown Lawyer",
+    specialization: spec,
+    experience: `${years} years`,
+    availability: "Available",
+    hourly_rate: l?.hourly_rate ?? 0,
+    is_verified: !!l?.is_verified,
+    bio: l?.bio || "",
+    source: "db",
   };
+};
 
-  const handleBookAppointment = (lawyerId) => {
-    console.log("Booking appointment with lawyer:", lawyerId);
-    // Add your booking logic here
-  };
+const normalizeDummyLawyer = (l) => ({
+  id: l.id, // string id for dummy
+  lawyer_id: null,
+  name: l.name,
+  specialization: l.specialization,
+  experience: l.experience,
+  availability: l.availability,
+  hourly_rate: null,
+  is_verified: false,
+  bio: "",
+  source: "dummy",
+});
+
+const keyOf = (l) =>
+  `${String(l.name).toLowerCase().trim()}|${String(l.specialization).toLowerCase().trim()}`;
+
+const Lawyers = () => {
+  const [dbLawyers, setDbLawyers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        setErr("");
+        const data = await listLawyers();
+        const normalized = Array.isArray(data) ? data.map(normalizeDbLawyer) : [];
+        setDbLawyers(normalized);
+      } catch (e) {
+        setErr(e?.message || "Failed to load lawyers");
+        setDbLawyers([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const mergedLawyers = useMemo(() => {
+    const dummy = dummyLawyers.map(normalizeDummyLawyer);
+
+    // merge + de-duplicate (prefer DB record)
+    const map = new Map();
+
+    for (const l of dummy) map.set(keyOf(l), l);
+    for (const l of dbLawyers) map.set(keyOf(l), l);
+
+    return Array.from(map.values());
+  }, [dbLawyers]);
+
+  if (loading) return <div className="p-6">Loading lawyers...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-
-      {/* Hero Section 182347*/}
-      <div className="bg-linear-to-r from-indigo-500 to-[#182347] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
-            Professional Legal Consultation
-          </h1>
-          <p className="text-lg sm:text-xl max-w-2xl mx-auto opacity-90">
-            Schedule your appointment with qualified legal professionals
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-[#142768]">Lawyers</h1>
+          <p className="text-gray-600 mt-2">
+            Browse lawyers and request an appointment.
           </p>
         </div>
-      </div>
 
-      {/* Search Section */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12">
-        <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-100">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Location */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location
-              </label>
-              <input
-                type="text"
-                placeholder="Enter city"
-                value={searchData.location}
-                onChange={(e) => setSearchData({...searchData, location: e.target.value})}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#142768]"
-              />
-            </div>
-
-            {/* Specialization */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Specialization
-              </label>
-              <select
-                value={searchData.specialization}
-                onChange={(e) => setSearchData({...searchData, specialization: e.target.value})}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#142768]"
-              >
-                <option value="">All Specializations</option>
-                {specializations.map(spec => (
-                  <option key={spec} value={spec}>{spec}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Date */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Date
-              </label>
-              <input
-                type="date"
-                value={searchData.date}
-                onChange={(e) => setSearchData({...searchData, date: e.target.value})}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#142768]"
-              />
-            </div>
-
-            {/* Search Button */}
-            <div className="flex items-end">
-              <button
-                onClick={handleSearch}
-                className="w-full bg-[#142768] hover:bg-indigo-700 text-white font-medium py-2.5 px-6 rounded transition duration-300"
-              >
-                Search
-              </button>
-            </div>
+        {err ? (
+          <div className="text-sm text-red-600 bg-red-50 border border-red-100 px-4 py-2 rounded-xl">
+            {err} (showing dummy list)
           </div>
-        </div>
+        ) : null}
       </div>
 
-      {/* Lawyers List */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold text-[#142768] mb-8 text-center">
-          Available Lawyers
-        </h2>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        {mergedLawyers.map((l) => {
+          const isDb = l.source === "db";
+          const canView = isDb && l.lawyer_id;
+          const canBook = isDb && l.lawyer_id;
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-          {lawyers.map(lawyer => (
-            <div key={lawyer.id} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-xl transition relative overflow-hidden group">
-              
-              {/* Accent stripe */}
-              <div className="absolute top-0 left-0 h-full w-1 bg-[#142768] group-hover:w-full transition-all duration-500 opacity-14"></div>
-
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-1">{lawyer.name}</h3>
-                  <p className="text-gray-600 mb-2">{lawyer.specialization}</p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span>Experience: {lawyer.experience}</span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      lawyer.availability === 'Available' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-500'
-                    }`}>
-                      {lawyer.availability}
-                    </span>
+          return (
+            <div key={String(l.id)} className="bg-white rounded-2xl shadow-sm border p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-lg font-bold text-[#142768] truncate">
+                    {l.name}
+                  </div>
+                  <div className="text-sm text-gray-600 truncate">
+                    {l.specialization}
                   </div>
                 </div>
 
-                <div>
-                <Link
-  to={lawyer.availability === 'Available' ? '/bookappointment' : '#'}
-  onClick={(e) => {
-    if (lawyer.availability !== 'Available') {
-      e.preventDefault();
-      return;
-    }
-    handleBookAppointment(lawyer.id);
-  }}
-  className={`px-6 py-2.5 rounded font-medium transition duration-300 ${
-    lawyer.availability === 'Available'
-      ? 'bg-[#142768] hover:bg-indigo-700 text-white'
-      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-  }`}
-  style={lawyer.availability !== 'Available' ? { pointerEvents: 'none' } : undefined}
->
-  Book Appointment
-</Link>
+                <div className="flex flex-col items-end gap-2">
+                  <div
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      l.availability === "Available"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {l.availability}
+                  </div>
 
+                  {isDb ? (
+                    <div
+                      className={`text-[11px] px-2 py-1 rounded-full ${
+                        l.is_verified ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {l.is_verified ? "Verified" : "Unverified"}
+                    </div>
+                  ) : (
+                    <div className="text-[11px] px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                      Dummy
+                    </div>
+                  )}
                 </div>
               </div>
+
+              <div className="mt-4 text-sm text-gray-700">
+                <div>
+                  <span className="font-semibold">Experience:</span> {l.experience}
+                </div>
+
+                {isDb ? (
+                  <div className="mt-1">
+                    <span className="font-semibold">Rate:</span>{" "}
+                    ${Number(l.hourly_rate || 0).toFixed(2)}/hr
+                  </div>
+                ) : null}
+              </div>
+
+              {isDb && l.bio ? (
+                <p className="mt-4 text-sm text-gray-600 line-clamp-3">{l.bio}</p>
+              ) : (
+                <p className="mt-4 text-sm text-gray-600 line-clamp-3">
+                  {isDb ? "No bio available." : "This profile is placeholder dummy data."}
+                </p>
+              )}
+
+              <div className="mt-5 flex gap-3">
+                {canView ? (
+                  <Link
+                    to={`/lawyerprofile?lawyerId=${l.lawyer_id}`}
+                    className="flex-1 text-center border border-[#142768] text-[#142768] py-2 rounded-xl hover:bg-blue-50 transition"
+                  >
+                    View Details
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className="flex-1 text-center border border-gray-300 text-gray-500 py-2 rounded-xl cursor-not-allowed"
+                    disabled
+                  >
+                    View Details
+                  </button>
+                )}
+
+                {canBook ? (
+                  <Link
+                    to={`/bookappointment?lawyerId=${l.lawyer_id}`}
+                    className="flex-1 text-center bg-[#142768] text-white py-2 rounded-xl hover:opacity-95 transition"
+                  >
+                    Book
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className="flex-1 text-center bg-gray-200 text-gray-600 py-2 rounded-xl cursor-not-allowed"
+                    disabled
+                    title="Dummy profiles cannot be booked"
+                  >
+                    Book
+                  </button>
+                )}
+              </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
-   
+      {!mergedLawyers.length ? (
+        <div className="mt-10 text-gray-600">No lawyers found.</div>
+      ) : null}
     </div>
   );
 };
 
-export default HomePage;
+export default Lawyers;

@@ -23,7 +23,7 @@ const Aboutus = () => {
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               About
               <span className="block text-transparent bg-clip-text bg-[#142768]">
-                LegalConnect              </span>
+                HireLawyer              </span>
             </h1>
                 <p className="text-lg max-w-2xl mx-auto opacity-90">
                     Bridging the gap between clients and legal professionals through seamless,
@@ -39,7 +39,7 @@ const Aboutus = () => {
                         Our Story
                     </h2>
                     <p className="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
-                        LegalConnect was founded with a simple mission: to make legal services
+                        HireLawyer was founded with a simple mission: to make legal services
                         more accessible and convenient for everyone. Scheduling appointments with
                         lawyers shouldn't be complicated or frustrating.
                     </p>
@@ -48,7 +48,7 @@ const Aboutus = () => {
                 {/* Why Choose */}
                 <div>
                     <h2 className="text-3xl font-semibold text-gray-900 text-center mb-10">
-                        Why Choose LegalConnect?
+                        Why Choose HireLawyer?
                     </h2>
 
                     <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">

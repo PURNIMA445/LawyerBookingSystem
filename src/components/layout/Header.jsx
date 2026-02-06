@@ -209,7 +209,7 @@ const Navbar = () => {
 
   const navLinks = useMemo(
     () => [
-      { to: "/home", label: "Home" },
+      { to: "/", label: "Home" },
       { to: "/aboutus", label: "About" },
       { to: "/services", label: "Services" },
       { to: "/lawyers", label: "Lawyers" },
@@ -232,7 +232,7 @@ const Navbar = () => {
             to="/"
             className="text-xl font-bold tracking-wide text-[#142768] absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0"
           >
-            LEGALCONNECT
+            HireLawyer
           </Link>
 
           <nav className="hidden lg:flex items-center gap-8 ml-12">

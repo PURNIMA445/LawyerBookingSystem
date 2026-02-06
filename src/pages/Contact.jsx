@@ -25,48 +25,47 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsSubmitting(false);
     setSubmitted(true);
   };
 
   const caseTypes = [
-    "Family Law",
-    "Criminal Defense",
-    "Corporate Law",
-    "Immigration",
-    "Real Estate",
-    "Personal Injury",
-    "Employment Law",
-    "Intellectual Property",
+    "Land & Property",
+    "Family & Divorce",
+    "Company Registration",
+    "Criminal Case",
+    "Employment/Labor",
+    "Tax & Compliance",
+    "Immigration/Travel",
+    "Cyber/Online Fraud",
     "Other"
   ];
 
   const officeLocations = [
     {
-      city: "New York",
-      address: "350 Fifth Avenue, Suite 4200",
-      zip: "New York, NY 10118",
-      phone: "+1 (212) 555-0123",
-      email: "nyc@lawfirm.com",
-      hours: "Mon - Fri: 9:00 AM - 6:00 PM"
+      city: "Kathmandu",
+      address: "New Baneshwor, Kathmandu",
+      zip: "Bagmati Province, Nepal",
+      phone: "+977 9800000000",
+      email: "kathmandu@legalconnect.com",
+      hours: "Sun - Fri: 10:00 AM - 6:00 PM"
     },
     {
-      city: "Los Angeles",
-      address: "633 West 5th Street, 28th Floor",
-      zip: "Los Angeles, CA 90071",
-      phone: "+1 (213) 555-0456",
-      email: "la@lawfirm.com",
-      hours: "Mon - Fri: 8:00 AM - 5:00 PM"
+      city: "Pokhara",
+      address: "Lakeside, Pokhara",
+      zip: "Gandaki Province, Nepal",
+      phone: "+977 9811111111",
+      email: "pokhara@legalconnect.com",
+      hours: "Sun - Fri: 10:00 AM - 5:30 PM"
     },
     {
-      city: "Chicago",
-      address: "233 South Wacker Drive, Suite 8400",
-      zip: "Chicago, IL 60606",
-      phone: "+1 (312) 555-0789",
-      email: "chicago@lawfirm.com",
-      hours: "Mon - Fri: 9:00 AM - 6:00 PM"
+      city: "Biratnagar",
+      address: "Main Road, Biratnagar",
+      zip: "Koshi Province, Nepal",
+      phone: "+977 9822222222",
+      email: "biratnagar@legalconnect.com",
+      hours: "Sun - Fri: 10:00 AM - 5:30 PM"
     }
   ];
 
@@ -81,7 +80,7 @@ const Contact = () => {
           </div>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Message Sent Successfully!</h2>
           <p className="text-gray-600 mb-8">
-            Thank you for reaching out. One of our legal experts will get back to you within 24 hours.
+            Thank you for reaching out. Our team will contact you within 24 hours.
           </p>
           <button
             onClick={() => {
@@ -105,7 +104,7 @@ const Contact = () => {
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-amber-50">
       {/* Hero Section */}
       <section className="relative py-12 lg:py-14 overflow-hidden">
-        
+
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
             {/* Badge */}
@@ -119,12 +118,12 @@ const Contact = () => {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
               Contact Our
               <span className="block text-transparent bg-clip-text bg-[#142768]">
-                Legal Team
+                Legal Team in Nepal
               </span>
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Have questions or need legal assistance? We're here to help. 
-              Reach out to us and our experienced attorneys will respond promptly.
+              Have questions or need legal assistance? We're here to help.
+              Share your issue and we’ll respond promptly.
             </p>
           </div>
         </div>
@@ -144,7 +143,7 @@ const Contact = () => {
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">Call Us</h3>
               <p className="text-[#142768] font-medium">+977 9800000000</p>
-              <p className="text-gray-500 text-sm mt-1">Available 24/7</p>
+              <p className="text-gray-500 text-sm mt-1">Sun - Fri</p>
             </div>
 
             {/* Email */}
@@ -156,7 +155,7 @@ const Contact = () => {
                 </svg>
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">Email Us</h3>
-              <p className="text-[#142768] font-medium">contact@lawfirm.com</p>
+              <p className="text-[#142768] font-medium">support@hirelawyer.com</p>
               <p className="text-gray-500 text-sm mt-1">Response within 24hrs</p>
             </div>
 
@@ -171,7 +170,7 @@ const Contact = () => {
               </div>
               <h3 className="font-semibold text-gray-900 mb-1">Visit Us</h3>
               <p className="text-[#142768] font-medium">3 Locations</p>
-              <p className="text-gray-500 text-sm mt-1">NYC, LA, Chicago</p>
+              <p className="text-gray-500 text-sm mt-1">Kathmandu, Pokhara, Biratnagar</p>
             </div>
 
             {/* Live Chat */}
@@ -215,7 +214,7 @@ const Contact = () => {
                         value={formData.name}
                         onChange={handleChange}
                         required
-                        placeholder="John Doe"
+                        placeholder="Sushil Sharma"
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
                           focus:ring-[#142768] focus:border-transparent transition-all duration-300"
                       />
@@ -230,7 +229,7 @@ const Contact = () => {
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        placeholder="john@example.com"
+                        placeholder="sushil@example.com"
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
                           focus:ring-[#142768] focus:border-transparent transition-all duration-300"
                       />
@@ -248,7 +247,7 @@ const Contact = () => {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        placeholder="+1 (555) 000-0000"
+                        placeholder="+977 98XXXXXXXX"
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
                           focus:ring-[#142768] focus:border-transparent transition-all duration-300"
                       />
@@ -263,7 +262,7 @@ const Contact = () => {
                         value={formData.subject}
                         onChange={handleChange}
                         required
-                        placeholder="How can we help?"
+                        placeholder="How can we help you?"
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
                           focus:ring-[#142768] focus:border-transparent transition-all duration-300"
                       />
@@ -347,7 +346,7 @@ const Contact = () => {
                       onChange={handleChange}
                       required
                       rows={5}
-                      placeholder="Please describe your legal matter in detail..."
+                      placeholder="Please describe your legal matter (land/property, family, business, etc.)..."
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 
                         focus:ring-[#142768] focus:border-transparent transition-all duration-300 resize-none"
                     ></textarea>
@@ -361,7 +360,7 @@ const Contact = () => {
                       className="w-5 h-5 mt-0.5 text-amber-500 focus:ring-[#142768] border-gray-300 rounded"
                     />
                     <p className="text-sm text-gray-600">
-                      I agree to the <a href="#" className="text-amber-600 hover:underline">Privacy Policy</a> and 
+                      I agree to the <a href="#" className="text-amber-600 hover:underline">Privacy Policy</a> and
                       consent to being contacted regarding my inquiry. All information shared is confidential.
                     </p>
                   </div>
@@ -400,7 +399,7 @@ const Contact = () => {
             <div className="lg:col-span-2">
               <div className="sticky top-8 space-y-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Our Offices</h3>
-                
+
                 {officeLocations.map((office, idx) => (
                   <div key={idx} className="bg-white rounded-2xl shadow-lg shadow-gray-100/50 p-6 hover:shadow-xl transition-all duration-300">
                     <div className="flex items-start gap-4">
@@ -413,7 +412,7 @@ const Contact = () => {
                         <h4 className="font-semibold text-gray-900 text-lg">{office.city}</h4>
                         <p className="text-gray-600 text-sm mt-1">{office.address}</p>
                         <p className="text-gray-600 text-sm">{office.zip}</p>
-                        
+
                         <div className="mt-4 space-y-2">
                           <a href={`tel:${office.phone}`} className="flex items-center gap-2 text-sm text-gray-600 hover:text-amber-600 transition-colors">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -450,13 +449,13 @@ const Contact = () => {
                     <h4 className="font-semibold text-lg">Emergency Legal Help</h4>
                   </div>
                   <p className="text-red-100 text-sm mb-4">
-                    For urgent legal matters requiring immediate attention, call our 24/7 emergency line.
+                    For urgent legal matters requiring immediate attention, call our emergency line.
                   </p>
-                  <a href="tel:+18005550911" className="inline-flex items-center gap-2 bg-white text-red-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-red-50 transition-colors">
+                  <a href="tel:+9779812345678" className="inline-flex items-center gap-2 bg-white text-red-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-red-50 transition-colors">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
-                    +1 (800) 555-0911
+                    +977 9812345678
                   </a>
                 </div>
               </div>
@@ -470,15 +469,15 @@ const Contact = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
             {/* Map Section */}
-<section className="py-12 bg-gray-100">
-  <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-      <div className="aspect-video">
-        <AddressMap />
-      </div>
-    </div>
-  </div>
-</section>
+            <section className="py-12 bg-gray-100">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+                  <div className="aspect-video">
+                    <AddressMap />
+                  </div>
+                </div>
+              </div>
+            </section>
 
           </div>
         </div>

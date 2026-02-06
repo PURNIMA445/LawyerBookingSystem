@@ -26,22 +26,22 @@ import Lawyers from './pages/Lawyers'
 
 const MyRoute = () => {
   return (
-   
+
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Layout />}>
           <Route index element={<LandingPage />} />
-          <Route path='/home' element={<HomePage />} />
+          {/* <Route path='/home' element={<HomePage />} /> */}
           <Route path='/aboutus' element={<Aboutus />} />
           <Route path='/services' element={<Services />} />
-          <Route path='/lawyers' element = {<Lawyers/>}/>
+          <Route path='/lawyers' element={<Lawyers />} />
           <Route path='/faq' element={<FAQ />} />
           <Route path='/contact' element={<Contact />} />
           <Route path='/terms' element={<TermsAndConditions />} />
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<SignUp />} />
           <Route path="/services/:id" element={<ServiceDetailsPage />} />
-          
+
           <Route path='admin' element={<AdminRoutes />}>
 
             <Route path='dashboard' element={<AdminDashboard />} />
@@ -52,15 +52,15 @@ const MyRoute = () => {
           <Route path='lawyer' element={<LawyerRoutes />}>
             <Route path='dashboard' element={<LawyerDashboard />} />
           </Route>
+          <Route path='/lawyerprofile' element={<LawyerProfile />} />
+          <Route path='/bookappointment' element={<BookAppointment />} />
         </Route>
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/clientprofile' element={<ClientProfile />} />
-        <Route path='/lawyerprofile' element={<LawyerProfile />} />
-        <Route path='/bookappointment' element={<BookAppointment />} />
       </Routes>
 
     </BrowserRouter>
-    
+
   )
 }
 

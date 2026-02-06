@@ -6,26 +6,27 @@ import { Link } from "react-router-dom";
 const Services = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Business Owner",
-      text: "Outstanding legal representation. They helped us navigate complex corporate matters with expertise and professionalism.",
-      rating: 5
-    },
-    {
-      name: "Michael Chen",
-      role: "Real Estate Investor",
-      text: "Highly recommend their services. The team was thorough, responsive, and achieved excellent results for our property disputes.",
-      rating: 5
-    },
-    {
-      name: "Emily Rodriguez",
-      role: "Individual Client",
-      text: "Compassionate and knowledgeable attorneys. They guided me through a difficult family matter with care and dedication.",
-      rating: 5
-    }
-  ];
+const testimonials = [
+  {
+    name: "Sushant Adhikari",
+    role: "Business Owner, Kathmandu",
+    text: "The platform made it very easy to connect with an experienced lawyer. I received clear guidance for company registration and legal compliance in Nepal.",
+    rating: 5
+  },
+  {
+    name: "Ramesh Thapa",
+    role: "Property Owner, Pokhara",
+    text: "I was facing land ownership issues and didn’t know where to start. Through this service, I found a reliable lawyer who handled everything professionally.",
+    rating: 5
+  },
+  {
+    name: "Nirmala Shrestha",
+    role: "Individual Client, Lalitpur",
+    text: "The lawyer was patient, respectful, and knowledgeable. The fee negotiation feature helped me feel confident before confirming the appointment.",
+    rating: 5
+  }
+];
+
 
   useEffect(() => {
     const timer = setInterval(() => {
