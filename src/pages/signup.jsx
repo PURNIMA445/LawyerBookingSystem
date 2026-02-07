@@ -1,7 +1,20 @@
 // SignUp.jsx
 import React, { useState } from "react";
 import { registerUser } from "../api/userApi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+const expToNumber = (value) => {
+  const v = String(value || "").trim();
+  if (!v) return 0;
+  if (v === "0-2") return 2;
+  if (v === "3-5") return 5;
+  if (v === "6-10") return 10;
+  if (v === "11-15") return 15;
+  if (v === "15+") return 15;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+};
+
 const SignUp = () => {
   const [step, setStep] = useState(1);
   const [userType, setUserType] = useState("");
@@ -19,24 +32,26 @@ const SignUp = () => {
     confirmPassword: "",
     agreeTerms: false,
 
-    // Lawyer specific
+    // Lawyer specific (UI fields kept, but backend only uses specialization + years + licenseDocument)
     barNumber: "",
     lawFirm: "",
     specialization: [],
     yearsOfExperience: "",
     licenseDocument: null,
 
-    // Admin specific
+    // Admin specific 
     adminCode: "",
     department: "",
 
-    // Client specific (optional)
+    // Client specific 
     dateOfBirth: "",
     address: "",
     city: "",
     state: "",
     zipCode: "",
   });
+
+  const navigate = useNavigate()
 
   const userTypes = [
     {
@@ -70,22 +85,24 @@ const SignUp = () => {
       borderColor: "border-indigo-500",
     },
   ];
- // Lawyer specific
+
+  // Lawyer specific
   const specializations = [
-    "Family Law",
+    "Corporate & Company Law",
+    "Family & Divorce Law",
     "Criminal Defense",
-    "Corporate Law",
-    "Immigration",
-    "Real Estate",
-    "Personal Injury",
-    "Employment Law",
-    "Intellectual Property",
-    "Tax Law",
-    "Bankruptcy",
-    "Civil Rights",
-    "Environmental Law",
+    "Land & Property Law",
+    "Labor & Employment Law",
+    "Tax & Compliance",
+    "Immigration & Travel",
+    "Banking & Finance",
+    "Civil Litigation",
+    "Consumer Protection",
+    "Cyber & Tech Law",
+    "Legal Documentation",
   ];
-//admin specific
+
+  // Admin specific (UI-only)
   const departments = [
     "User Management",
     "Lawyer Verification",
@@ -114,21 +131,15 @@ const SignUp = () => {
       }));
     }
 
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     if (submitError) setSubmitError("");
   };
 
-  // STEP 2 VALIDATION:
-  // All account types require: firstName, lastName, email, phone, password, confirmPassword
   const validateStep2 = () => {
     const newErrors = {};
 
-    if (!formData.firstName.trim())
-      newErrors.firstName = "First name is required";
-    if (!formData.lastName.trim())
-      newErrors.lastName = "Last name is required";
+    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
 
     if (!formData.email) {
       newErrors.email = "Email is required";
@@ -136,9 +147,7 @@ const SignUp = () => {
       newErrors.email = "Invalid email format";
     }
 
-    if (!formData.phone) {
-      newErrors.phone = "Phone number is required";
-    }
+    if (!formData.phone) newErrors.phone = "Phone number is required";
 
     if (!formData.password) {
       newErrors.password = "Password is required";
@@ -156,51 +165,29 @@ const SignUp = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // STEP 3 VALIDATION:
-  // - Client & Admin: only need agreeTerms here
-  // - Lawyer: barNumber, lawFirm, specialization, yearsOfExperience, licenseDocument + agreeTerms
   const validateStep3 = () => {
     const newErrors = {};
 
     if (userType === "lawyer") {
-      if (!formData.barNumber.trim()) {
-        newErrors.barNumber = "Bar number is required";
-      }
-      if (!formData.lawFirm.trim()) {
-        newErrors.lawFirm = "Law firm is required";
-      }
-      if (!formData.yearsOfExperience) {
-        newErrors.yearsOfExperience = "Experience is required";
-      }
-      if (formData.specialization.length === 0) {
-        newErrors.specialization = "Select at least one specialization";
-      }
-      if (!formData.licenseDocument) {
-        newErrors.licenseDocument = "License document is required";
-      }
+      if (!formData.yearsOfExperience) newErrors.yearsOfExperience = "Experience is required";
+      if (formData.specialization.length === 0) newErrors.specialization = "Select at least one specialization";
+
+      
     }
 
-    if (!formData.agreeTerms) {
-      newErrors.agreeTerms = "You must agree to the terms";
-    }
+    if (!formData.agreeTerms) newErrors.agreeTerms = "You must agree to the terms";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleNext = () => {
-    if (step === 1 && userType) {
-      setStep(2);
-    } else if (step === 2 && validateStep2()) {
-      setStep(3);
-    }
+    if (step === 1 && userType) setStep(2);
+    else if (step === 2 && validateStep2()) setStep(3);
   };
 
-  const handleBack = () => {
-    setStep((prev) => prev - 1);
-  };
+  const handleBack = () => setStep((prev) => prev - 1);
 
-  // SUBMIT: build payload per account type & call API handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateStep3()) return;
@@ -211,8 +198,8 @@ const SignUp = () => {
     const fullName = `${formData.firstName} ${formData.lastName}`.trim();
 
     const payload = {
-      userType, // 'client' | 'lawyer' | 'admin'
-      role: userType, // for backend that expects `role`
+      userType,
+      role: userType,
       full_name: fullName,
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -221,29 +208,11 @@ const SignUp = () => {
       password: formData.password,
     };
 
-    if (userType === "client") {
-      Object.assign(payload, {
-        dateOfBirth: formData.dateOfBirth,
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        zipCode: formData.zipCode,
-      });
-    }
-
-    if (userType === "admin") {
-      Object.assign(payload, {
-        adminCode: formData.adminCode,
-        department: formData.department,
-      });
-    }
-
     if (userType === "lawyer") {
       Object.assign(payload, {
-        barNumber: formData.barNumber,
-        lawFirm: formData.lawFirm,
-        yearsOfExperience: formData.yearsOfExperience,
         specialization: formData.specialization,
+        yearsOfExperience: expToNumber(formData.yearsOfExperience),
+        
       });
     }
 
@@ -254,11 +223,16 @@ const SignUp = () => {
       );
 
       console.log("Registration success:", data);
-      // TODO: redirect / show toast / clear form as needed
+      alert("Registration success:", data);
+
+      // Persist auth 
+      localStorage.setItem("auth", JSON.stringify(data));
+
+      navigate("/profile");
 
     } catch (err) {
       console.error(err);
-      setSubmitError(err.message || "Registration failed");
+      setSubmitError(err?.message || "Registration failed");
     } finally {
       setIsLoading(false);
     }
@@ -268,28 +242,17 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-  <div className="w-full lg:w-7/12 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-linear-to-br from-slate-50 via-white to-indigo-50 overflow-y-auto">
-    <div className="w-full max-w-full">
+      <div className="w-full lg:w-7/12 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-linear-to-br from-slate-50 via-white to-indigo-50 overflow-y-auto">
+        <div className="w-full max-w-full">
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center gap-3 mb-6">
             <div className="w-10 h-10 bg-indigo-900 rounded-xl flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
-                />
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
               </svg>
             </div>
-            <span className="text-xl font-bold text-gray-900">
-              Hire Lawyer
-            </span>
+            <span className="text-xl font-bold text-gray-900">Hire Lawyer</span>
           </div>
 
           {/* Progress Steps */}
@@ -299,35 +262,21 @@ const SignUp = () => {
                 <React.Fragment key={s}>
                   <div
                     className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm transition-all duration-300 ${
-                      step >= s
-                        ? "bg-[#142768] text-white"
-                        : "bg-gray-200 text-gray-500"
+                      step >= s ? "bg-[#142768] text-white" : "bg-gray-200 text-gray-500"
                     }`}
                   >
                     {step > s ? (
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
                       s
                     )}
                   </div>
                   {s < 3 && (
-                    <div
-                      className={`flex-1 h-1 mx-2 rounded-full transition-all duration-300 ${
-                        step > s ? "bg-[#142768]" : "bg-gray-200"
-                      }`}
-                    ></div>
+                    <div className={`flex-1 h-1 mx-2 rounded-full transition-all duration-300 ${
+                      step > s ? "bg-[#142768]" : "bg-gray-200"
+                    }`}></div>
                   )}
                 </React.Fragment>
               ))}
@@ -339,16 +288,12 @@ const SignUp = () => {
             </div>
           </div>
 
-          {/* Step 1: Select User Type */}
+          {/* Step 1 */}
           {step === 1 && (
             <div className="space-y-6">
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Create Account
-                </h2>
-                <p className="text-gray-600">
-                  Select your account type to get started
-                </p>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+                <p className="text-gray-600">Select your account type to get started</p>
               </div>
 
               <div className="grid gap-4">
@@ -356,17 +301,15 @@ const SignUp = () => {
                   <button
                     key={type.id}
                     onClick={() => setUserType(type.id)}
-                    className={`relative p-6 rounded-2xl border-2 text-left transition-all duration-300 group
-                      ${
-                        userType === type.id
-                          ? `${type.borderColor} ${type.bgLight} shadow-lg`
-                          : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"
-                      }`}
+                    className={`relative p-6 rounded-2xl border-2 text-left transition-all duration-300 group ${
+                      userType === type.id
+                        ? `${type.borderColor} ${type.bgLight} shadow-lg`
+                        : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"
+                    }`}
                   >
                     <div className="flex items-start gap-4">
                       <div
-                        className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl
-                        ${
+                        className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl ${
                           userType === type.id
                             ? `bg-linear-to-r ${type.color} shadow-lg`
                             : "bg-gray-100 group-hover:bg-gray-200"
@@ -375,73 +318,42 @@ const SignUp = () => {
                         {type.icon}
                       </div>
                       <div className="flex-1">
-                        <h3
-                          className={`font-semibold text-lg ${
-                            userType === type.id
-                              ? type.textColor
-                              : "text-gray-900"
-                          }`}
-                        >
+                        <h3 className={`font-semibold text-lg ${
+                          userType === type.id ? type.textColor : "text-gray-900"
+                        }`}>
                           {type.title}
                         </h3>
-                        <p className="text-gray-500 text-sm mt-1">
-                          {type.description}
-                        </p>
+                        <p className="text-gray-500 text-sm mt-1">{type.description}</p>
                       </div>
                       <div
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300
-                          ${
-                            userType === type.id
-                              ? "border-blue-500 bg-blue-500"
-                              : "border-gray-300"
-                          }`}
-                        onClick={() => setUserType(type.id)}
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                          userType === type.id ? "border-blue-500 bg-blue-500" : "border-gray-300"
+                        }`}
                       >
-                        {userType === type.id && (
-                          <div className="w-3 h-3 rounded-full bg-white"></div>
-                        )}
+                        {userType === type.id && <div className="w-3 h-3 rounded-full bg-white"></div>}
                       </div>
                     </div>
 
-                    {/* Feature tags */}
                     <div className="flex flex-wrap gap-2 mt-4">
                       {type.id === "client" && (
                         <>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">
-                            Book Appointments
-                          </span>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">
-                            Track Cases
-                          </span>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">
-                            Secure Messaging
-                          </span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Book Appointments</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Track History</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Secure Messaging</span>
                         </>
                       )}
                       {type.id === "lawyer" && (
                         <>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">
-                            Manage Schedule
-                          </span>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">
-                            Client Portal
-                          </span>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">
-                            Billing Tools
-                          </span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Manage Requests</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Negotiate Fees</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Accept / Reject</span>
                         </>
                       )}
                       {type.id === "admin" && (
                         <>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">
-                            User Management
-                          </span>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">
-                            Analytics
-                          </span>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">
-                            System Control
-                          </span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">User Management</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Verification</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">System Control</span>
                         </>
                       )}
                     </div>
@@ -452,34 +364,17 @@ const SignUp = () => {
               <button
                 onClick={handleNext}
                 disabled={!userType}
-                className="w-full py-4 bg-[#142768] text-white font-semibold rounded-xl
-                  hover:shadow-lg  
-                 disabled:cursor-not-allowed disabled:hover:translate-y-0
-                  flex items-center justify-center gap-2"
+                className="w-full py-4 bg-[#142768] text-white font-semibold rounded-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 Continue
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M14 5l7 7m0 0l-7 7m7-7H3"
-                  />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
 
-              {/* Sign In Link */}
               <p className="text-center text-gray-600">
                 Already have an account?{" "}
-                <Link
-                  to="/login"
-                  className="text-[#142768] hover:text-black font-semibold hover:underline"
-                >
+                <Link to="/login" className="text-[#142768] hover:text-black font-semibold hover:underline">
                   Sign In
                 </Link>
               </p>
@@ -1288,18 +1183,9 @@ const SignUp = () => {
 
           {/* Security Notice */}
           <div className="mt-8 flex items-center justify-center gap-2 text-xs text-gray-400">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
             <span>Your information is protected and secure</span>
           </div>
