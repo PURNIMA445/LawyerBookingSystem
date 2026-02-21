@@ -19,10 +19,18 @@ import LawyerRoutes from './protectedRoutes/LawyerRoutes'
 import LawyerDashboard from './pages/lawyer/LawyerDashboard'
 import ServiceDetailsPage from './pages/ServiceDetailsPage'
 import Dashboard from './pages/Dashboard'
-import ClientProfile from './pages/ClientProfile'
-import LawyerProfile from './pages/LawyerProfile'
 import BookAppointment from './pages/BookAppointment'
 import Lawyers from './pages/Lawyers'
+import AppointmentDetails from './pages/lawyer/AppointmentDetails'
+import UpdateProfile from './pages/lawyer/UpdateProfile'
+import AdminLayout from './components/layout/AdminLayout'
+import AdminUsers from './pages/admin/AdminUsers'
+import AdminLawyers from './pages/admin/AdminLawyers'
+import AdminAppointments from './pages/admin/AdminAppointments'
+import AdminAdmins from './pages/admin/AdminAdmins'
+import AdminLawyerProfile from './pages/LawyerProfile'
+import AdminClientProfile from './pages/admin/ClientProfile'
+import LawyerProfile from './pages/LawyerProfile'
 
 const MyRoute = () => {
   return (
@@ -42,21 +50,39 @@ const MyRoute = () => {
           <Route path='/signup' element={<SignUp />} />
           <Route path="/services/:id" element={<ServiceDetailsPage />} />
 
-          <Route path='admin' element={<AdminRoutes />}>
 
-            <Route path='dashboard' element={<AdminDashboard />} />
-          </Route>
+
           <Route path='/' element={<ClientRoutes />}>
             <Route path='profile' element={<Profile />} />
           </Route>
-          <Route path='lawyer' element={<LawyerRoutes />}>
-            <Route path='dashboard' element={<LawyerDashboard />} />
-          </Route>
-          <Route path='/lawyerprofile' element={<LawyerProfile />} />
+
+          <Route path='/lawyers/:lawyerId' element={<AdminLawyerProfile />} />
           <Route path='/bookappointment' element={<BookAppointment />} />
         </Route>
+
+        <Route path='lawyer' element={<LawyerRoutes />}>
+          <Route path='dashboard' element={<LawyerProfile />} />
+          <Route path='appointments/:id' element={<AppointmentDetails />} />
+          <Route path="profile/edit" element={<UpdateProfile />} />
+
+        </Route>
+
+        <Route path='/' element={<AdminRoutes />}>
+          <Route path="admin" element={<AdminLayout />}>
+
+            <Route path='dashboard' element={<AdminDashboard />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="lawyers" element={<AdminLawyers />} />
+            <Route path='lawyers/:lawyerId' element={<AdminLawyerProfile />} />
+            <Route path="appointments" element={<AdminAppointments />} />
+            <Route path="admins" element={<AdminAdmins />} />
+            <Route path='clients/:clientId' element={<AdminClientProfile />} />
+
+          </Route>
+        </Route>
+
+
         <Route path='/dashboard' element={<Dashboard />} />
-        <Route path='/clientprofile' element={<ClientProfile />} />
       </Routes>
 
     </BrowserRouter>

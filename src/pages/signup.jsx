@@ -3,18 +3,6 @@ import React, { useState } from "react";
 import { registerUser } from "../api/userApi";
 import { Link, useNavigate } from "react-router-dom";
 
-const expToNumber = (value) => {
-  const v = String(value || "").trim();
-  if (!v) return 0;
-  if (v === "0-2") return 2;
-  if (v === "3-5") return 5;
-  if (v === "6-10") return 10;
-  if (v === "11-15") return 15;
-  if (v === "15+") return 15;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
-};
-
 const SignUp = () => {
   const [step, setStep] = useState(1);
   const [userType, setUserType] = useState("");
@@ -32,18 +20,18 @@ const SignUp = () => {
     confirmPassword: "",
     agreeTerms: false,
 
-    // Lawyer specific (UI fields kept, but backend only uses specialization + years + licenseDocument)
-    barNumber: "",
-    lawFirm: "",
+    // Lawyer fields (backend-aligned)
     specialization: [],
-    yearsOfExperience: "",
+    yearsOfExperience: "", // ✅ numeric
+    hourlyRate: "", // ✅ NEW (Rs.)
+    bio: "", // ✅ NEW
     licenseDocument: null,
 
-    // Admin specific 
+    // Admin specific (UI-only)
     adminCode: "",
     department: "",
 
-    // Client specific 
+    // Client specific (UI-only)
     dateOfBirth: "",
     address: "",
     city: "",
@@ -51,7 +39,7 @@ const SignUp = () => {
     zipCode: "",
   });
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const userTypes = [
     {
@@ -86,7 +74,7 @@ const SignUp = () => {
     },
   ];
 
-  // Lawyer specific
+  // Lawyer specializations
   const specializations = [
     "Corporate & Company Law",
     "Family & Divorce Law",
@@ -102,7 +90,7 @@ const SignUp = () => {
     "Legal Documentation",
   ];
 
-  // Admin specific (UI-only)
+  // Admin departments (UI-only)
   const departments = [
     "User Management",
     "Lawyer Verification",
@@ -116,7 +104,7 @@ const SignUp = () => {
     const { name, value, type, checked, files } = e.target;
 
     if (type === "file") {
-      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+      setFormData((prev) => ({ ...prev, [name]: files?.[0] || null }));
     } else if (type === "checkbox" && name === "specialization") {
       setFormData((prev) => ({
         ...prev,
@@ -135,6 +123,7 @@ const SignUp = () => {
     if (submitError) setSubmitError("");
   };
 
+  // STEP 2 VALIDATION
   const validateStep2 = () => {
     const newErrors = {};
 
@@ -165,14 +154,32 @@ const SignUp = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // STEP 3 VALIDATION
   const validateStep3 = () => {
     const newErrors = {};
 
     if (userType === "lawyer") {
-      if (!formData.yearsOfExperience) newErrors.yearsOfExperience = "Experience is required";
-      if (formData.specialization.length === 0) newErrors.specialization = "Select at least one specialization";
+      if (formData.specialization.length === 0) {
+        newErrors.specialization = "Select at least one specialization";
+      }
 
-      
+      if (!String(formData.yearsOfExperience).trim()) {
+        newErrors.yearsOfExperience = "Experience is required";
+      } else {
+        const n = Number(formData.yearsOfExperience);
+        if (!Number.isFinite(n) || n < 0 || n > 50) {
+          newErrors.yearsOfExperience = "Experience must be a number between 0 and 50";
+        }
+      }
+
+      if (String(formData.hourlyRate).trim()) {
+        const r = Number(formData.hourlyRate);
+        if (!Number.isFinite(r) || r < 0) newErrors.hourlyRate = "Hourly rate must be a valid number";
+      }
+
+      if (String(formData.bio || "").length > 1000) {
+        newErrors.bio = "Bio is too long (max 1000 characters)";
+      }
     }
 
     if (!formData.agreeTerms) newErrors.agreeTerms = "You must agree to the terms";
@@ -208,11 +215,31 @@ const SignUp = () => {
       password: formData.password,
     };
 
+    // NOTE: Backend currently stores lawyer fields in lawyers table (specialization, experience_years, hourly_rate, bio, license_document)
     if (userType === "lawyer") {
       Object.assign(payload, {
         specialization: formData.specialization,
-        yearsOfExperience: expToNumber(formData.yearsOfExperience),
-        
+        experience_years: Number(formData.yearsOfExperience),
+        hourly_rate: String(formData.hourlyRate).trim() ? Number(formData.hourlyRate) : null,
+        bio: String(formData.bio || "").trim() ? formData.bio : null,
+      });
+    }
+
+    // Client/Admin extra fields are UI-only unless your backend supports them
+    if (userType === "client") {
+      Object.assign(payload, {
+        dateOfBirth: formData.dateOfBirth,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+      });
+    }
+
+    if (userType === "admin") {
+      Object.assign(payload, {
+        adminCode: formData.adminCode,
+        department: formData.department,
       });
     }
 
@@ -222,14 +249,10 @@ const SignUp = () => {
         userType === "lawyer" ? formData.licenseDocument : null
       );
 
-      console.log("Registration success:", data);
-      alert("Registration success:", data);
-
-      // Persist auth 
+      // Persist auth
       localStorage.setItem("auth", JSON.stringify(data));
 
       navigate("/profile");
-
     } catch (err) {
       console.error(err);
       setSubmitError(err?.message || "Registration failed");
@@ -248,8 +271,12 @@ const SignUp = () => {
           <div className="lg:hidden flex items-center justify-center gap-3 mb-6">
             <div className="w-10 h-10 bg-indigo-900 rounded-xl flex items-center justify-center">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
+                />
               </svg>
             </div>
             <span className="text-xl font-bold text-gray-900">Hire Lawyer</span>
@@ -274,9 +301,11 @@ const SignUp = () => {
                     )}
                   </div>
                   {s < 3 && (
-                    <div className={`flex-1 h-1 mx-2 rounded-full transition-all duration-300 ${
-                      step > s ? "bg-[#142768]" : "bg-gray-200"
-                    }`}></div>
+                    <div
+                      className={`flex-1 h-1 mx-2 rounded-full transition-all duration-300 ${
+                        step > s ? "bg-[#142768]" : "bg-gray-200"
+                      }`}
+                    ></div>
                   )}
                 </React.Fragment>
               ))}
@@ -288,7 +317,7 @@ const SignUp = () => {
             </div>
           </div>
 
-          {/* Step 1 */}
+          {/* Step 1: Select User Type */}
           {step === 1 && (
             <div className="space-y-6">
               <div className="text-center mb-8">
@@ -318,9 +347,7 @@ const SignUp = () => {
                         {type.icon}
                       </div>
                       <div className="flex-1">
-                        <h3 className={`font-semibold text-lg ${
-                          userType === type.id ? type.textColor : "text-gray-900"
-                        }`}>
+                        <h3 className={`font-semibold text-lg ${userType === type.id ? type.textColor : "text-gray-900"}`}>
                           {type.title}
                         </h3>
                         <p className="text-gray-500 text-sm mt-1">{type.description}</p>
@@ -345,8 +372,8 @@ const SignUp = () => {
                       {type.id === "lawyer" && (
                         <>
                           <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Manage Requests</span>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Negotiate Fees</span>
-                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Accept / Reject</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Set Fees</span>
+                          <span className="px-2 py-1 bg-[#142768] text-white text-xs rounded-full">Profile & Docs</span>
                         </>
                       )}
                       {type.id === "admin" && (
@@ -391,14 +418,11 @@ const SignUp = () => {
                   <span>{selectedType?.icon}</span>
                   {selectedType?.title} Registration
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Basic Information
-                </h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Basic Information</h2>
                 <p className="text-gray-600">Tell us about yourself</p>
               </div>
 
               <form className="space-y-5">
-                {/* Name Row */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -410,20 +434,13 @@ const SignUp = () => {
                       value={formData.firstName}
                       onChange={handleChange}
                       placeholder="John"
-                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
-                        ${
-                          errors.firstName
-                            ? "border-red-300 focus:ring-red-500"
-                            : "border-gray-200 focus:ring-indigo-500"
-                        }
-                        focus:outline-none focus:ring-2 focus:border-transparent`}
+                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-300 ${
+                        errors.firstName ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-indigo-500"
+                      } focus:outline-none focus:ring-2 focus:border-transparent`}
                     />
-                    {errors.firstName && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.firstName}
-                      </p>
-                    )}
+                    {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Last Name <span className="text-red-500">*</span>
@@ -434,35 +451,21 @@ const SignUp = () => {
                       value={formData.lastName}
                       onChange={handleChange}
                       placeholder="Doe"
-                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
-                        ${
-                          errors.lastName
-                            ? "border-red-300 focus:ring-red-500"
-                            : "border-gray-200 focus:ring-indigo-500"
-                        }
-                        focus:outline-none focus:ring-2 focus:border-transparent`}
+                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-300 ${
+                        errors.lastName ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-indigo-500"
+                      } focus:outline-none focus:ring-2 focus:border-transparent`}
                     />
-                    {errors.lastName && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.lastName}
-                      </p>
-                    )}
+                    {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
                   </div>
                 </div>
 
-                {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Email Address <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <svg
-                        className="w-5 h-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -477,35 +480,21 @@ const SignUp = () => {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="john@example.com"
-                      className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-all duration-300
-                        ${
-                          errors.email
-                            ? "border-red-300 focus:ring-red-500"
-                            : "border-gray-200 focus:ring-indigo-500"
-                        }
-                        focus:outline-none focus:ring-2 focus:border-transparent`}
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-all duration-300 ${
+                        errors.email ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-indigo-500"
+                      } focus:outline-none focus:ring-2 focus:border-transparent`}
                     />
                   </div>
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.email}
-                    </p>
-                  )}
+                  {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                 </div>
 
-                {/* Phone */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Phone Number <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <svg
-                        className="w-5 h-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -519,24 +508,15 @@ const SignUp = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="+1 (555) 000-0000"
-                      className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-all duration-300
-                        ${
-                          errors.phone
-                            ? "border-red-300 focus:ring-red-500"
-                            : "border-gray-200 focus:ring-indigo-500"
-                        }
-                        focus:outline-none focus:ring-2 focus:border-transparent`}
+                      placeholder="+977 98XXXXXXXX"
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-all duration-300 ${
+                        errors.phone ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-indigo-500"
+                      } focus:outline-none focus:ring-2 focus:border-transparent`}
                     />
                   </div>
-                  {errors.phone && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.phone}
-                    </p>
-                  )}
+                  {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
                 </div>
 
-                {/* Password & Confirm */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -548,20 +528,13 @@ const SignUp = () => {
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
-                        ${
-                          errors.password
-                            ? "border-red-300 focus:ring-red-500"
-                            : "border-gray-200 focus:ring-indigo-500"
-                        }
-                        focus:outline-none focus:ring-2 focus:border-transparent`}
+                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-300 ${
+                        errors.password ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-indigo-500"
+                      } focus:outline-none focus:ring-2 focus:border-transparent`}
                     />
-                    {errors.password && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.password}
-                      </p>
-                    )}
+                    {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Confirm Password <span className="text-red-500">*</span>
@@ -572,66 +545,34 @@ const SignUp = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
-                        ${
-                          errors.confirmPassword
-                            ? "border-red-300 focus:ring-red-500"
-                            : "border-gray-200 focus:ring-indigo-500"
-                        }
-                        focus:outline-none focus:ring-2 focus:border-transparent`}
+                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-300 ${
+                        errors.confirmPassword ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-indigo-500"
+                      } focus:outline-none focus:ring-2 focus:border-transparent`}
                     />
-                    {errors.confirmPassword && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.confirmPassword}
-                      </p>
-                    )}
+                    {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>}
                   </div>
                 </div>
 
-                {/* Navigation Buttons */}
                 <div className="flex gap-4 pt-4">
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="flex-1 py-3.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl
-                      hover:bg-gray-50 hover:border-gray-300 transition-all duration-300
-                      flex items-center justify-center gap-2"
+                    className="flex-1 py-3.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 flex items-center justify-center gap-2"
                   >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                      />
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back
                   </button>
+
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="flex-1 py-3.5 bg-[#142768] text-white font-semibold rounded-xl
-                      hover:shadow-lg hover:shadow-indigo-200 transition-all duration-300
-                      flex items-center justify-center gap-2"
+                    className="flex-1 py-3.5 bg-[#142768] text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-indigo-200 transition-all duration-300 flex items-center justify-center gap-2"
                   >
                     Continue
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M14 5l7 7m0 0l-7 7m7-7H3"
-                      />
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </button>
                 </div>
@@ -649,14 +590,14 @@ const SignUp = () => {
                   <span>{selectedType?.icon}</span>
                   {selectedType?.title} Details
                 </div>
+
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                   {userType === "lawyer" && "Professional Information"}
                   {userType === "admin" && "Admin Verification"}
                   {userType === "client" && "Personal Details"}
                 </h2>
-                <p className="text-gray-600">
-                  Complete your profile to get started
-                </p>
+
+                <p className="text-gray-600">Complete your profile to get started</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -664,127 +605,115 @@ const SignUp = () => {
                 {userType === "lawyer" && (
                   <>
                     <div className="grid sm:grid-cols-2 gap-4">
+                      {/* Years of Experience - numeric */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Bar Number <span className="text-red-500">*</span>
+                          Years of Experience <span className="text-red-500">*</span>
                         </label>
                         <input
-                          type="text"
-                          name="barNumber"
-                          value={formData.barNumber}
-                          onChange={handleChange}
-                          placeholder="e.g., NY12345"
-                          className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
-                            ${errors.barNumber ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
-                            focus:outline-none focus:ring-2 focus:border-transparent`}
-                        />
-                        {errors.barNumber && (
-                          <p className="mt-1 text-sm text-red-600">
-                            {errors.barNumber}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Years of Experience{" "}
-                          <span className="text-red-500">*</span>
-                        </label>
-                        <select
+                          type="number"
                           name="yearsOfExperience"
                           value={formData.yearsOfExperience}
                           onChange={handleChange}
+                          min="0"
+                          max="50"
+                          placeholder="e.g., 5"
                           className={`w-full px-4 py-3 rounded-xl border bg-white transition-all duration-300
-                            ${errors.yearsOfExperience ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'}
+                            ${errors.yearsOfExperience ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-indigo-500"}
                             focus:outline-none focus:ring-2 focus:border-transparent`}
-                        >
-                          <option value="">Select experience</option>
-                          <option value="0-2">0-2 years</option>
-                          <option value="3-5">3-5 years</option>
-                          <option value="6-10">6-10 years</option>
-                          <option value="11-15">11-15 years</option>
-                          <option value="15+">15+ years</option>
-                        </select>
-                        {errors.yearsOfExperience && (
-                          <p className="mt-1 text-sm text-red-600">
-                            {errors.yearsOfExperience}
-                          </p>
-                        )}
+                        />
+                        {errors.yearsOfExperience && <p className="mt-1 text-sm text-red-600">{errors.yearsOfExperience}</p>}
+                      </div>
+
+                      {/* Hourly Rate */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Hourly Rate (Rs.)
+                        </label>
+                        <input
+                          type="number"
+                          name="hourlyRate"
+                          value={formData.hourlyRate}
+                          onChange={handleChange}
+                          min="0"
+                          step="0.01"
+                          placeholder="e.g., 2500"
+                          className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
+                            ${errors.hourlyRate ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-indigo-500"}
+                            focus:outline-none focus:ring-2 focus:border-transparent`}
+                        />
+                        {errors.hourlyRate && <p className="mt-1 text-sm text-red-600">{errors.hourlyRate}</p>}
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Law Firm (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        name="lawFirm"
-                        value={formData.lawFirm}
-                        onChange={handleChange}
-                        placeholder="Enter your law firm name"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-indigo-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
-                      />
-                      {errors.lawFirm && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {errors.lawFirm}
-                        </p>
-                      )}
-                    </div>
-
+                    {/* Specializations */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-3">
                         Specializations <span className="text-red-500">*</span>
                       </label>
+
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {specializations.map((spec) => (
-                          <label
-                            key={spec}
-                            className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all duration-200
-                              ${formData.specialization.includes(spec) 
-                                ? 'border-indigo-500 bg-indigo-50 text-white' 
-                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
-                          >
-                            <input
-                              type="checkbox"
-                              name="specialization"
-                              value={spec}
-                              checked={formData.specialization.includes(spec)}
-                              onChange={handleChange}
-                              className="sr-only"
-                            />
-                            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center
-                              ${formData.specialization.includes(spec) ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300'}`}>
-                              {formData.specialization.includes(spec) && (
-                                <svg
-                                  className="w-3 h-3 text-white"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={3}
-                                    d="M5 13l4 4L19 7"
-                                  />
-                                </svg>
-                              )}
-                            </div>
-                            <span className="text-sm">{spec}</span>
-                          </label>
-                        ))}
+                        {specializations.map((spec) => {
+                          const selected = formData.specialization.includes(spec);
+                          return (
+                            <label
+                              key={spec}
+                              className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all duration-200 ${
+                                selected ? "border-indigo-500 bg-indigo-50" : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                name="specialization"
+                                value={spec}
+                                checked={selected}
+                                onChange={handleChange}
+                                className="sr-only"
+                              />
+                              <div
+                                className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                                  selected ? "border-indigo-500 bg-indigo-500" : "border-gray-300"
+                                }`}
+                              >
+                                {selected && (
+                                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </div>
+                              <span className="text-sm text-gray-800">{spec}</span>
+                            </label>
+                          );
+                        })}
                       </div>
-                      {errors.specialization && (
-                        <p className="mt-2 text-sm text-red-600">
-                          {errors.specialization}
-                        </p>
-                      )}
+
+                      {errors.specialization && <p className="mt-2 text-sm text-red-600">{errors.specialization}</p>}
                     </div>
 
+                    {/* Bio */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Professional Bio
+                      </label>
+                      <textarea
+                        name="bio"
+                        rows={4}
+                        value={formData.bio}
+                        onChange={handleChange}
+                        placeholder="Brief summary about your experience and expertise"
+                        className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
+                          ${errors.bio ? "border-red-300 focus:ring-red-500" : "border-gray-200 focus:ring-indigo-500"}
+                          focus:outline-none focus:ring-2 focus:border-transparent`}
+                      />
+                      {errors.bio && <p className="mt-1 text-sm text-red-600">{errors.bio}</p>}
+                    </div>
+
+                    {/* License Document */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         License Document (Optional)
                       </label>
+
                       <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-indigo-400 transition-colors duration-300">
                         <input
                           type="file"
@@ -795,12 +724,7 @@ const SignUp = () => {
                           id="license-upload"
                         />
                         <label htmlFor="license-upload" className="cursor-pointer">
-                          <svg
-                            className="w-10 h-10 text-gray-400 mx-auto mb-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
+                          <svg className="w-10 h-10 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -811,32 +735,23 @@ const SignUp = () => {
                           <p className="text-gray-600 text-sm">
                             <span className="text-indigo-600 font-medium">Click to upload</span> or drag and drop
                           </p>
+                          <p className="text-xs text-gray-400 mt-1">PDF / JPG / PNG</p>
                         </label>
+
                         {formData.licenseDocument && (
-                          <p className="mt-2 text-sm text-green-600">
-                            {formData.licenseDocument.name}
-                          </p>
+                          <p className="mt-2 text-sm text-green-600">{formData.licenseDocument.name}</p>
                         )}
                       </div>
-                      {errors.licenseDocument && (
-                        <p className="mt-2 text-sm text-red-600">
-                          {errors.licenseDocument}
-                        </p>
-                      )}
                     </div>
                   </>
                 )}
 
-                {/* ADMIN FIELDS */}
+                {/* ADMIN FIELDS (unchanged UI-only) */}
                 {userType === "admin" && (
                   <>
                     <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-4">
                       <div className="flex items-start gap-3">
-                        <svg
-                          className="w-5 h-5 text-purple-600 mt-0.5"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
+                        <svg className="w-5 h-5 text-purple-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                           <path
                             fillRule="evenodd"
                             d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -844,52 +759,28 @@ const SignUp = () => {
                           />
                         </svg>
                         <div>
-                          <p className="text-purple-800 font-medium text-sm">
-                            Admin Verification Required
-                          </p>
+                          <p className="text-purple-800 font-medium text-sm">Admin Verification Required</p>
                           <p className="text-purple-600 text-sm mt-1">
-                            You need a valid admin code provided by the system
-                            administrator to register as an admin.
+                            You need a valid admin code provided by the system administrator to register as an admin.
                           </p>
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Admin Verification Code
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                          <svg
-                            className="w-5 h-5 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                            />
-                          </svg>
-                        </div>
-                        <input
-                          type="text"
-                          name="adminCode"
-                          value={formData.adminCode}
-                          onChange={handleChange}
-                          placeholder="Enter admin code"
-                          className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-purple-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
-                        />
-                      </div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Admin Verification Code</label>
+                      <input
+                        type="text"
+                        name="adminCode"
+                        value={formData.adminCode}
+                        onChange={handleChange}
+                        placeholder="Enter admin code"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-purple-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
+                      />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Department
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
                       <select
                         name="department"
                         value={formData.department}
@@ -904,153 +795,69 @@ const SignUp = () => {
                         ))}
                       </select>
                     </div>
-
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <h4 className="font-medium text-gray-900 mb-3">
-                        Admin Privileges Include:
-                      </h4>
-                      <ul className="space-y-2">
-                        {[
-                          "User account management",
-                          "Lawyer verification & approval",
-                          "Platform analytics & reports",
-                          "Content moderation",
-                          "System configuration",
-                        ].map((item, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-center gap-2 text-sm text-gray-600"
-                          >
-                            <svg
-                              className="w-4 h-4 text-purple-500"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
                   </>
                 )}
 
-                {/* CLIENT FIELDS */}
+                {/* CLIENT FIELDS (unchanged UI-only) */}
                 {userType === "client" && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Date of Birth
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
                       <input
                         type="date"
                         name="dateOfBirth"
                         value={formData.dateOfBirth}
                         onChange={handleChange}
-                        className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
-                          border-gray-200 focus:ring-indigo-500
-                          focus:outline-none focus:ring-2 focus:border-transparent`}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-indigo-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Street Address
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
                       <input
                         type="text"
                         name="address"
                         value={formData.address}
                         onChange={handleChange}
                         placeholder="123 Main Street, Apt 4B"
-                        className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
-                          border-gray-200 focus:ring-indigo-500
-                          focus:outline-none focus:ring-2 focus:border-transparent`}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-indigo-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
                       />
                     </div>
 
                     <div className="grid sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          City
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
                         <input
                           type="text"
                           name="city"
                           value={formData.city}
                           onChange={handleChange}
-                          placeholder="New York"
-                          className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
-                            border-gray-200 focus:ring-indigo-500
-                            focus:outline-none focus:ring-2 focus:border-transparent`}
+                          placeholder="Kathmandu"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-indigo-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          State
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
                         <input
                           type="text"
                           name="state"
                           value={formData.state}
                           onChange={handleChange}
-                          placeholder="NY"
-                          className={`w-full px-4 py-3 rounded-xl border transition-all duration-300
-                            border-gray-200 focus:ring-indigo-500
-                            focus:outline-none focus:ring-2 focus:border-transparent`}
+                          placeholder="Bagmati"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-indigo-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          ZIP Code
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">ZIP Code</label>
                         <input
                           type="text"
                           name="zipCode"
                           value={formData.zipCode}
                           onChange={handleChange}
-                          placeholder="10001"
+                          placeholder="44600"
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-indigo-500 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-300"
                         />
                       </div>
-                    </div>
-
-                    <div className="bg-indigo-50 rounded-xl p-4">
-                      <h4 className="font-medium text-indigo-900 mb-3">
-                        As a Client, You Can:
-                      </h4>
-                      <ul className="space-y-2">
-                        {[
-                          "Browse and search verified lawyers",
-                          "Book appointments online",
-                          "Securely message your attorney",
-                          "Track your case progress",
-                          "Access legal documents",
-                        ].map((item, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-center gap-2 text-sm text-indigo-70"
-                          >
-                            <svg
-                              className="w-4 h-4 text-indigo-500"
-                              fill="currentColor"
-                              vindigoox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
                     </div>
                   </>
                 )}
@@ -1067,88 +874,43 @@ const SignUp = () => {
                     />
                     <span className="text-sm text-gray-600">
                       I agree to the{" "}
-                      <a
-                        href="#"
-                        className="text-indigo-600 hover:underline font-medium"
-                      >
+                      <a href="#" className="text-indigo-600 hover:underline font-medium">
                         Terms of Service
                       </a>{" "}
                       and{" "}
-                      <a
-                        href="#"
-                        className="text-indigo-600 hover:underline font-medium"
-                      >
+                      <a href="#" className="text-indigo-600 hover:underline font-medium">
                         Privacy Policy
                       </a>
                       .
-                      {userType === "lawyer" && (
-                        <span>
-                          {" "}
-                          I also confirm that all professional information
-                          provided is accurate and verifiable.
-                        </span>
-                      )}
                     </span>
                   </label>
-                  {errors.agreeTerms && (
-                    <p className="mt-2 text-sm text-red-600">
-                      {errors.agreeTerms}
-                    </p>
-                  )}
+                  {errors.agreeTerms && <p className="mt-2 text-sm text-red-600">{errors.agreeTerms}</p>}
                 </div>
 
-                {/* Submit error */}
-                {submitError && (
-                  <p className="text-sm text-red-600">{submitError}</p>
-                )}
+                {submitError && <p className="text-sm text-red-600">{submitError}</p>}
 
-                {/* Navigation Buttons */}
+                {/* Buttons */}
                 <div className="flex gap-4 pt-4">
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="flex-1 py-3.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl
-                      hover:bg-gray-50 hover:border-gray-300 transition-all duration-300
-                      flex items-center justify-center gap-2"
+                    className="flex-1 py-3.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 flex items-center justify-center gap-2"
                   >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                      />
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back
                   </button>
+
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className={`flex-1 py-3.5 font-semibold rounded-xl transition-all duration-300
-                      flex items-center justify-center gap-2
-                      bg-[#142768]
-                      text-white hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed`}
+                    className="flex-1 py-3.5 font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 bg-[#142768] text-white hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     {isLoading ? (
                       <>
-                        <svg
-                          className="animate-spin w-5 h-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
+                        <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path
                             className="opacity-75"
                             fill="currentColor"
@@ -1158,22 +920,12 @@ const SignUp = () => {
                         Creating Account...
                       </>
                     ) : (
-                      <span className="inline-flex items-center text-white bg-[#142768] py-3.5 px-3.5 space-x-2 rounded">
+                      <>
                         Create Account
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                      </span>
+                      </>
                     )}
                   </button>
                 </div>
@@ -1184,8 +936,12 @@ const SignUp = () => {
           {/* Security Notice */}
           <div className="mt-8 flex items-center justify-center gap-2 text-xs text-gray-400">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
             </svg>
             <span>Your information is protected and secure</span>
           </div>

@@ -2,194 +2,269 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { listLawyers } from "../api/lawyersApi";
 
-
+/* ---------------- DUMMY LAWYERS (NEPAL) ---------------- */
 const dummyLawyers = [
   {
-    id: "d1",
-    name: "Adv. Sushil Koirala",
-    specialization: "Corporate & Company Law",
-    experience_years: 16,
+    lawyer_id: "d1",
+    full_name: "Adv. Ramesh Adhikari",
+    specialization: "Family Law",
+    experience_years: 12,
+    hourly_rate: 2500,
+    is_verified: 1,
+    availability: "unavailable",
   },
   {
-    id: "d2",
-    name: "Adv. Rina Shrestha",
-    specialization: "Family & Divorce Law",
-    experience_years: 11,
+    lawyer_id: "d2",
+    full_name: "Adv. Sita Koirala",
+    specialization: "Criminal Law",
+    experience_years: 18,
+    hourly_rate: 4000,
+    is_verified: 1,
+    availability: "unavailable",
   },
   {
-    id: "d3",
-    name: "Adv. Prakash Adhikari",
-    specialization: "Criminal Defense",
-    experience_years: 14,
+    lawyer_id: "d3",
+    full_name: "Adv. Bikash Shrestha",
+    specialization: "Corporate Law",
+    experience_years: 9,
+    hourly_rate: 3000,
+    is_verified: 1,
+    availability: "unavailable",
   },
   {
-    id: "d4",
-    name: "Adv. Anil Thapa",
-    specialization: "Land & Property Law",
-    experience_years: 19,
+    lawyer_id: "d4",
+    full_name: "Adv. Anjana Thapa",
+    specialization: "Property Law",
+    experience_years: 15,
+    hourly_rate: 3500,
+    is_verified: 1,
+    availability: "unavailable",
+  },
+  {
+    lawyer_id: "d5",
+    full_name: "Adv. Nabin Poudel",
+    specialization: "Tax Law",
+    experience_years: 22,
+    hourly_rate: 5000,
+    is_verified: 1,
+    availability: "unavailable",
   },
 ];
 
-
-const normalizeDbLawyer = (l) => ({
-  id: l.lawyer_id,
-  lawyer_id: l.lawyer_id,
-  name: l.full_name,
-  specialization: l.specialization || "General Practice",
-  experience: `${l.experience_years || 0} years`,
-  hourly_rate: l.hourly_rate,
-  is_verified: Boolean(l.is_verified),
-  bio: l.bio || "",
-  available: true,
-});
-
-const normalizeDummyLawyer = (l) => ({
-  id: l.id,
-  lawyer_id: null,
-  name: l.name,
-  specialization: l.specialization,
-  experience: `${l.experience_years} years`,
-  hourly_rate: null,
-  is_verified: false,
-  bio: "",
-  available: false,
-});
-
-
-const Lawyers = () => {
+export default function Lawyers() {
   const [dbLawyers, setDbLawyers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
+  const [filters, setFilters] = useState({
+    experienceMin: 1,
+    experienceMax: 40,
+    feeMin: "",
+    feeMax: "",
+    specialization: [],
+  });
+
+  /* ---------------- FETCH DB LAWYERS ---------------- */
   useEffect(() => {
     (async () => {
       try {
-        setLoading(true);
         const data = await listLawyers();
-        const normalized = Array.isArray(data)
-          ? data.map(normalizeDbLawyer)
-          : [];
+        const normalized = (data || []).map(l => ({
+          ...l,
+          availability: "available",
+        }));
         setDbLawyers(normalized);
-      } catch (e) {
-        setError("Could not load lawyers from server");
-        setDbLawyers([]);
+      } catch (err) {
+        console.error(err);
       } finally {
         setLoading(false);
       }
     })();
   }, []);
 
-  const lawyers = useMemo(() => {
-    if (dbLawyers.length) return dbLawyers;
-    return dummyLawyers.map(normalizeDummyLawyer);
-  }, [dbLawyers]);
+  /* ---------------- MERGE DATA ---------------- */
+  const allLawyers = useMemo(
+    () => [...dbLawyers, ...dummyLawyers],
+    [dbLawyers]
+  );
 
-  if (loading) {
-    return <div className="p-8 text-gray-600">Loading lawyers...</div>;
-  }
+  /* ---------------- SPECIALIZATIONS ---------------- */
+  const specializations = useMemo(() => {
+    const set = new Set();
+    allLawyers.forEach(l => l.specialization && set.add(l.specialization));
+    return Array.from(set);
+  }, [allLawyers]);
+
+  /* ---------------- FILTER LOGIC ---------------- */
+  const filteredLawyers = useMemo(() => {
+    return allLawyers.filter(l => {
+      if (!Number(l.is_verified)) return false;
+
+      if (
+        l.experience_years < filters.experienceMin ||
+        l.experience_years > filters.experienceMax
+      ) return false;
+
+      if (filters.feeMin && l.hourly_rate < Number(filters.feeMin)) return false;
+      if (filters.feeMax && l.hourly_rate > Number(filters.feeMax)) return false;
+
+      if (
+        filters.specialization.length &&
+        !filters.specialization.includes(l.specialization)
+      ) return false;
+
+      return true;
+    });
+  }, [allLawyers, filters]);
+
+  const toggleSpec = (spec) => {
+    setFilters(prev => ({
+      ...prev,
+      specialization: prev.specialization.includes(spec)
+        ? prev.specialization.filter(s => s !== spec)
+        : [...prev.specialization, spec],
+    }));
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#142768]">Lawyers</h1>
-        <p className="text-gray-600 mt-2">
-          Browse verified lawyers and request an appointment.
-        </p>
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
 
-        {error && (
-          <div className="mt-3 text-sm text-red-600 bg-red-50 border border-red-100 px-4 py-2 rounded-lg">
-            {error} — showing limited list
+        {/* ---------------- FILTER SIDEBAR ---------------- */}
+        <aside className="md:col-span-1 space-y-8">
+
+          <div>
+            <h3 className="font-semibold mb-3">Experience (Years)</h3>
+            <div className="flex gap-3">
+              <input
+                type="number"
+                min="1"
+                max="40"
+                value={filters.experienceMin}
+                onChange={e =>
+                  setFilters(f => ({ ...f, experienceMin: Number(e.target.value) }))
+                }
+                className="w-full border rounded-lg px-3 py-2"
+              />
+              <input
+                type="number"
+                min="1"
+                max="40"
+                value={filters.experienceMax}
+                onChange={e =>
+                  setFilters(f => ({ ...f, experienceMax: Number(e.target.value) }))
+                }
+                className="w-full border rounded-lg px-3 py-2"
+              />
+            </div>
           </div>
-        )}
-      </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {lawyers.map((l) => (
-          <div
-            key={l.id}
-            className="bg-white border rounded-2xl p-6 shadow-sm flex flex-col"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-[#142768]">
-                  {l.name}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {l.specialization}
-                </p>
+          <div>
+            <h3 className="font-semibold mb-3">Hourly Rate (Rs.)</h3>
+            <div className="flex gap-3">
+              <input
+                type="number"
+                placeholder="Min"
+                value={filters.feeMin}
+                onChange={e =>
+                  setFilters(f => ({ ...f, feeMin: e.target.value }))
+                }
+                className="w-full border rounded-lg px-3 py-2"
+              />
+              <input
+                type="number"
+                placeholder="Max"
+                value={filters.feeMax}
+                onChange={e =>
+                  setFilters(f => ({ ...f, feeMax: e.target.value }))
+                }
+                className="w-full border rounded-lg px-3 py-2"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-3">Field of Expertise</h3>
+            <div className="space-y-2">
+              {specializations.map(spec => (
+                <label key={spec} className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={filters.specialization.includes(spec)}
+                    onChange={() => toggleSpec(spec)}
+                  />
+                  {spec}
+                </label>
+              ))}
+            </div>
+          </div>
+
+        </aside>
+
+        {/* ---------------- LAWYER CARDS ---------------- */}
+        <section className="md:col-span-3 grid sm:grid-cols-2 gap-5">
+
+          {loading && <p className="text-gray-500">Loading lawyers...</p>}
+
+          {!loading && filteredLawyers.length === 0 && (
+            <p className="text-gray-500">No lawyers found.</p>
+          )}
+
+          {filteredLawyers.map(l => (
+            <div
+              key={l.lawyer_id}
+              className="bg-white border rounded-2xl  shadow-sm hover:shadow-md transition h-56 p-7"
+            >
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-semibold text-lg">{l.full_name}</h3>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full ${
+                    l.availability === "available"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {l.availability === "available" ? "Available" : "Unavailable"}
+                </span>
               </div>
 
-              <span
-                className={`text-xs px-2 py-1 rounded-full ${
-                  l.is_verified
-                    ? "bg-blue-100 text-blue-700"
-                    : "bg-gray-100 text-gray-500"
-                }`}
-              >
-                {l.is_verified ? "Verified" : "Unverified"}
-              </span>
-            </div>
+              <p className="text-sm text-gray-600">{l.specialization}</p>
+              <p className="text-sm text-gray-600">
+                {l.experience_years} years experience
+              </p>
 
-            <div className="mt-4 text-sm text-gray-700">
-              <div>
-                <strong>Experience:</strong> {l.experience}
-              </div>
+              <p className="mt-2 font-medium text-[#142768]">
+                Rs. {l.hourly_rate} / hour
+              </p>
 
-              {l.hourly_rate !== null && (
-                <div className="mt-1">
-                  <strong>Rate:</strong> Rs.{l.hourly_rate}/hr
-                </div>
-              )}
-            </div>
+              <div className="mt-4 flex gap-3">
+                <Link
+                  to={`/lawyers/${l.lawyer_id}`}
+                  className="flex-1 text-center border rounded-lg py-2 text-sm hover:bg-gray-50"
+                >
+                  View Profile
+                </Link>
 
-            <p className="mt-4 text-sm text-gray-600 line-clamp-3">
-              {l.bio || "No bio available."}
-            </p>
-
-            <div className="mt-6 flex gap-3">
-              {l.available ? (
-                <>
+                {l.availability === "available" ? (
                   <Link
-                    to={`/lawyerprofile?lawyerId=${l.lawyer_id}`}
-                    className="flex-1 text-center border border-[#142768] text-[#142768] py-2 rounded-xl hover:bg-blue-50 transition"
-                  >
-                    View Profile
-                  </Link>
-
-                  <Link
-                    to={`/bookappointment?lawyerId=${l.lawyer_id}`}
-                    className="flex-1 text-center bg-[#142768] text-white py-2 rounded-xl hover:opacity-95 transition"
+                    to={`/appointments/book/${l.lawyer_id}`}
+                    className="flex-1 text-center bg-[#142768] text-white rounded-lg py-2 text-sm hover:opacity-90"
                   >
                     Book
                   </Link>
-                </>
-              ) : (
-                <>
+                ) : (
                   <button
                     disabled
-                    className="flex-1 border border-gray-300 text-gray-400 py-2 rounded-xl cursor-not-allowed"
+                    className="flex-1 bg-gray-200 text-gray-500 rounded-lg py-2 text-sm cursor-not-allowed"
                   >
-                    View Profile
+                    Unavailable
                   </button>
-
-                  <button
-                    disabled
-                    className="flex-1 bg-gray-200 text-gray-500 py-2 rounded-xl cursor-not-allowed"
-                  >
-                    Book
-                  </button>
-                </>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
 
-      {!lawyers.length && (
-        <div className="mt-10 text-gray-600">No lawyers found.</div>
-      )}
+        </section>
+      </div>
     </div>
   );
-};
-
-export default Lawyers;
+}
