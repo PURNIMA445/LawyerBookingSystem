@@ -253,7 +253,7 @@ const Navbar = () => {
               <div className="flex items-center gap-3">
                 <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100">
                   <span className="text-base">{badge.icon}</span>
-                  <span className="text-sm font-semibold text-[#142768] truncate max-w-[160px]">
+                  <span className="text-sm font-semibold text-[#142768] truncate max-w-40">
                     {name}
                   </span>
                   <span className="text-xs text-[#142768]/70">• {badge.label}</span>
@@ -275,7 +275,7 @@ const Navbar = () => {
                   </button>
 
                   {notifOpen ? (
-                    <div className="absolute right-0 mt-2 w-[360px] bg-white border rounded-2xl shadow-lg overflow-hidden z-50">
+                    <div className="absolute right-0 mt-2 w-90 bg-white border rounded-2xl shadow-lg overflow-hidden z-50">
                       <div className="flex items-center justify-between px-4 py-3 border-b">
                         <div className="font-semibold text-[#142768]">Notifications</div>
                         <button
@@ -296,7 +296,7 @@ const Navbar = () => {
                           Loading...
                         </div>
                       ) : notifs.length ? (
-                        <div className="max-h-[380px] overflow-auto">
+                        <div className="max-h-95 overflow-auto">
                           {notifs.map((n) => (
                             <button
                               key={n.notification_id}
@@ -320,7 +320,7 @@ const Navbar = () => {
                                   </div>
                                 </div>
                                 {!n.is_read ? (
-                                  <span className="mt-1 w-2.5 h-2.5 rounded-full bg-red-600 flex-shrink-0" />
+                                  <span className="mt-1 w-2.5 h-2.5 rounded-full bg-red-600 shrink-0" />
                                 ) : null}
                               </div>
                             </button>

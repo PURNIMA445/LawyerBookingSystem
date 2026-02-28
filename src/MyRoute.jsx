@@ -32,6 +32,7 @@ import AdminLawyerProfile from './pages/LawyerProfile'
 import AdminClientProfile from './pages/admin/ClientProfile'
 import LawyerProfile from './pages/LawyerProfile'
 
+import ChatPage from "./chatapp/ChatPage";
 const MyRoute = () => {
   return (
 
@@ -83,6 +84,7 @@ const MyRoute = () => {
 
 
         <Route path='/dashboard' element={<Dashboard />} />
+        <Route path="/chat" element={<ChatPage />} />
       </Routes>
 
     </BrowserRouter>
