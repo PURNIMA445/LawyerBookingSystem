@@ -72,7 +72,7 @@ export default function LandingPage() {
         </div>
 
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
-          LegalConnect
+          HireLawyer
           <span className="block bg-[#142768] bg-clip-text text-transparent">
             Legal Help, Made Simple
           </span>

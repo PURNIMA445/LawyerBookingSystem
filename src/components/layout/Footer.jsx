@@ -20,11 +20,11 @@ const Footer = () => {
           <div className="flex items-center gap-2 mb-4">
             <Scale className="w-7 h-7 text-white" />
             <span className="text-xl font-bold text-white">
-              LegalConnect
+              HireLawyer
             </span>
           </div>
           <p className="text-sm leading-relaxed text-slate-400">
-            LegalConnect is a Nepal-focused platform that helps clients connect
+            HireLawyer is a Nepal-focused platform that helps clients connect
             with verified lawyers, request appointments, negotiate fees, and
             manage legal consultations with confidence.
           </p>
@@ -92,7 +92,7 @@ const Footer = () => {
             </li>
             <li className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-slate-400" />
-              <span>support@legalconnect.com</span>
+              <span>support@hirelawyer.com</span>
             </li>
           </ul>
 
@@ -115,7 +115,7 @@ const Footer = () => {
       <div className="border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-slate-400">
           <p>
-            © {new Date().getFullYear()} LegalConnect. All rights reserved.
+            © {new Date().getFullYear()} HireLawyer. All rights reserved.
           </p>
           <p>
             Built for Nepal 🇳🇵 | Connecting Clients & Lawyers

@@ -14,13 +14,13 @@ export default function TermsAndConditions() {
       title: "Acceptance of Terms",
       icon: <FileText className="w-5 h-5" />,
       content:
-        "By accessing and using LegalConnect, you confirm that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use our services."
+        "By accessing and using HireLawyer, you confirm that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use our services."
     },
     {
       title: "Services Provided",
       icon: <Scale className="w-5 h-5" />,
       content:
-        "LegalConnect is a platform that helps clients in Nepal connect with lawyers and request appointments. We provide tools for booking requests, fee negotiation, appointment history, and communication. We do not provide legal advice directly and are not responsible for the legal services delivered by lawyers."
+        "HireLawyer is a platform that helps clients in Nepal connect with lawyers and request appointments. We provide tools for booking requests, fee negotiation, appointment history, and communication. We do not provide legal advice directly and are not responsible for the legal services delivered by lawyers."
     },
     {
       title: "User Responsibilities",
@@ -50,7 +50,7 @@ export default function TermsAndConditions() {
       title: "Limitation of Liability",
       icon: <AlertCircle className="w-5 h-5" />,
       content:
-        "LegalConnect is provided on an 'as-is' basis without warranties of any kind. We are not liable for the quality of legal advice, outcomes, or services provided by lawyers. We are also not responsible for delays or issues caused by external factors (internet outages, third-party services, or events beyond our reasonable control)."
+        "HireLawyer is provided on an 'as-is' basis without warranties of any kind. We are not liable for the quality of legal advice, outcomes, or services provided by lawyers. We are also not responsible for delays or issues caused by external factors (internet outages, third-party services, or events beyond our reasonable control)."
     },
     {
       title: "Termination",
@@ -69,7 +69,7 @@ export default function TermsAndConditions() {
             <Scale className="w-8 h-8 text-[#142768]" />
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Terms & Conditions</h1>
-              <p className="text-sm text-slate-600 mt-1">LegalConnect (Nepal)</p>
+              <p className="text-sm text-slate-600 mt-1">HireLawyer (Nepal)</p>
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@ export default function TermsAndConditions() {
             <div className="flex-1">
               <h2 className="text-xl font-semibold text-slate-900 mb-2">Welcome</h2>
               <p className="text-slate-700 leading-relaxed">
-                Please read these Terms and Conditions carefully before using LegalConnect.
+                Please read these Terms and Conditions carefully before using HireLawyer.
                 These terms govern your use of the platform and outline responsibilities for clients and lawyers in Nepal.
               </p>
               <p className="text-sm text-slate-600 mt-3">
@@ -145,7 +145,7 @@ export default function TermsAndConditions() {
             If you have any questions about these Terms and Conditions, please contact us:
           </p>
           <div className="space-y-2 text-slate-700">
-            <p><strong>Email:</strong> support@legalconnect.com</p>
+            <p><strong>Email:</strong> support@hirelawyer.com</p>
             <p><strong>Phone:</strong> +977 9800000000</p>
             <p><strong>Address:</strong> New Baneshwor, Kathmandu, Nepal</p>
           </div>
@@ -162,7 +162,7 @@ export default function TermsAndConditions() {
             />
             <span className="text-slate-700 leading-relaxed">
               I have read, understood, and agree to be bound by these Terms and Conditions.
-              I acknowledge that by using LegalConnect, I am entering into a legally binding agreement.
+              I acknowledge that by using HireLawyer, I am entering into a legally binding agreement.
             </span>
           </label>
           

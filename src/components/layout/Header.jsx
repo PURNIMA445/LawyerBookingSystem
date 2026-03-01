@@ -241,13 +241,31 @@ const Navbar = () => {
                 key={link.to}
                 to={link.to}
                 className={`text-gray-700 font-medium transition-colors pb-2 ${location.pathname === link.to
-                    ? "border-b-4 border-[#142768] text-[#142768]"
-                    : "border-b-4 border-transparent hover:border-[#142768] hover:text-[#142768]"
+                  ? "border-b-4 border-[#142768] text-[#142768]"
+                  : "border-b-4 border-transparent hover:border-[#142768] hover:text-[#142768]"
                   }`}
               >
                 {link.label}
               </Link>
             ))}
+
+            {(role === "client" || role === "lawyer") ? (
+              <Link to="/notary" className={`text-gray-700 font-medium transition-colors pb-2 ${location.pathname === '/notary'
+                  ? "border-b-4 border-[#142768] text-[#142768]"
+                  : "border-b-4 border-transparent hover:border-[#142768] hover:text-[#142768]"
+                  }`}>
+                Notary Service
+              </Link>
+            ) : null}
+
+            {role === "admin" ? (
+              <Link to="/notary" className={`text-gray-700 font-medium transition-colors pb-2 ${location.pathname === '/notary'
+                  ? "border-b-4 border-[#142768] text-[#142768]"
+                  : "border-b-4 border-transparent hover:border-[#142768] hover:text-[#142768]"
+                  }`}>
+                Notary (Admin)
+              </Link>
+            ) : null}
 
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
@@ -394,8 +412,8 @@ const Navbar = () => {
                   key={link.to}
                   to={link.to}
                   className={`text-gray-700 font-medium py-2 px-4 rounded-md transition-colors ${location.pathname === link.to
-                      ? "bg-blue-100 text-[#142768]"
-                      : "hover:bg-gray-50 hover:text-[#142768]"
+                    ? "bg-blue-100 text-[#142768]"
+                    : "hover:bg-gray-50 hover:text-[#142768]"
                     }`}
                   onClick={() => setToggle(false)}
                 >

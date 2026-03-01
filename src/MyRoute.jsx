@@ -33,6 +33,9 @@ import AdminClientProfile from './pages/admin/ClientProfile'
 import LawyerProfile from './pages/LawyerProfile'
 
 import ChatPage from "./chatapp/ChatPage";
+import NotaryDetails from './pages/notary/NotaryDetails'
+import NotaryCreate from './pages/notary/NotaryCreate'
+import NotaryList from './pages/notary/NotaryList'
 const MyRoute = () => {
   return (
 
@@ -59,6 +62,10 @@ const MyRoute = () => {
 
           <Route path='/lawyers/:lawyerId' element={<AdminLawyerProfile />} />
           <Route path='/bookappointment' element={<BookAppointment />} />
+
+          <Route path="/notary" element={<NotaryList />} />
+          <Route path="/notary/new" element={<NotaryCreate />} />
+          <Route path="/notary/:id" element={<NotaryDetails />} />
         </Route>
 
         <Route path='lawyer' element={<LawyerRoutes />}>
@@ -81,6 +88,8 @@ const MyRoute = () => {
 
           </Route>
         </Route>
+
+
 
 
         <Route path='/dashboard' element={<Dashboard />} />

@@ -140,7 +140,7 @@ const LawyerProfile = () => {
     return Number(lawyerId) === Number(authUserId);
   }, [authRole, authUserId, lawyerId]);
 
-  // ✅ Only show these for self logged-in lawyer
+  // for self logged-in lawyer
   const showSelfControls = isSelfView;
   const showMessagesTab = isSelfView; // you asked: messages tab only for self
 
@@ -238,6 +238,7 @@ const LawyerProfile = () => {
       { key: "appointments", label: "Appointments" },
       { key: "cases", label: "Case History" },
       { key: "documents", label: "Documents" },
+      { key: "messages", label: "Messages" },
     ];
 
     if (showMessagesTab) base.push({ key: "messages", label: "Messages" });

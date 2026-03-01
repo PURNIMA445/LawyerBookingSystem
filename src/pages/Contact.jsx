@@ -48,7 +48,7 @@ const Contact = () => {
       address: "New Baneshwor, Kathmandu",
       zip: "Bagmati Province, Nepal",
       phone: "+977 9800000000",
-      email: "kathmandu@legalconnect.com",
+      email: "kathmandu@hirelawyer.com",
       hours: "Sun - Fri: 10:00 AM - 6:00 PM"
     },
     {
@@ -56,7 +56,7 @@ const Contact = () => {
       address: "Lakeside, Pokhara",
       zip: "Gandaki Province, Nepal",
       phone: "+977 9811111111",
-      email: "pokhara@legalconnect.com",
+      email: "pokhara@hirelawyer.com",
       hours: "Sun - Fri: 10:00 AM - 5:30 PM"
     },
     {
@@ -64,7 +64,7 @@ const Contact = () => {
       address: "Main Road, Biratnagar",
       zip: "Koshi Province, Nepal",
       phone: "+977 9822222222",
-      email: "biratnagar@legalconnect.com",
+      email: "biratnagar@hirelawyer.com",
       hours: "Sun - Fri: 10:00 AM - 5:30 PM"
     }
   ];
