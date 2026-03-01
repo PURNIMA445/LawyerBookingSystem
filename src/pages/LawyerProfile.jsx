@@ -12,6 +12,7 @@ const getAuthUser = () => {
   try {
     // Common patterns
     const raw =
+      localStorage.getItem("auth") ||
       localStorage.getItem("authUser") ||
       localStorage.getItem("user") ||
       localStorage.getItem("currentUser");
