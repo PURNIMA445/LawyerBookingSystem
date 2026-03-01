@@ -15,16 +15,14 @@ const formatDate = (d) => {
 
 const badge = (status) => {
   const s = String(status || "").toLowerCase();
-
-  // ✅ more consistent, modern pill styling
   const base =
-    "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset whitespace-nowrap";
+    "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset whitespace-nowrap";
 
-  if (["verified"].includes(s))
+  if (s === "verified")
     return `${base} bg-emerald-50 text-emerald-700 ring-emerald-200`;
-  if (["notarized"].includes(s))
+  if (s === "notarized")
     return `${base} bg-blue-50 text-blue-700 ring-blue-200`;
-  if (["paid", "in_review", "submitted"].includes(s))
+  if (["paid", "submitted", "in_review"].includes(s))
     return `${base} bg-amber-50 text-amber-700 ring-amber-200`;
   if (["rejected", "cancelled"].includes(s))
     return `${base} bg-rose-50 text-rose-700 ring-rose-200`;
@@ -66,241 +64,170 @@ const NotaryList = () => {
     };
   }, [items]);
 
-  if (loading) {
-    return (
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-gray-100 animate-pulse" />
-          <div className="space-y-2">
-            <div className="h-4 w-48 rounded bg-gray-100 animate-pulse" />
-            <div className="h-3 w-72 rounded bg-gray-100 animate-pulse" />
-          </div>
-        </div>
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border p-4 bg-gray-50">
-              <div className="h-3 w-16 rounded bg-gray-200 animate-pulse" />
-              <div className="mt-2 h-7 w-14 rounded bg-gray-200 animate-pulse" />
-            </div>
-          ))}
-        </div>
-        <div className="mt-6 h-48 rounded-2xl border bg-gray-50 animate-pulse" />
-        <div className="mt-3 text-sm text-gray-500">Loading notary requests…</div>
-      </div>
-    );
-  }
-
-  if (err) {
-    return (
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
-        <div className="flex items-start gap-3">
-          <div className="mt-1 h-9 w-9 rounded-xl bg-rose-50 ring-1 ring-rose-200 flex items-center justify-center">
-            <span className="text-rose-700 font-bold">!</span>
-          </div>
-          <div className="flex-1">
-            <div className="text-lg font-semibold text-gray-900">Something went wrong</div>
-            <div className="mt-1 text-sm text-rose-700">{err}</div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                onClick={load}
-                className="inline-flex items-center justify-center rounded-xl border bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 active:scale-[0.99]"
-              >
-                Retry
-              </button>
-              <button
-                onClick={() => navigate("/notary/new")}
-                className="inline-flex items-center justify-center rounded-xl bg-[#142768] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-95 active:scale-[0.99]"
-              >
-                + New Request
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="px-4 sm:px-6 lg:px-8 py-10">Loading notary requests…</div>;
+  if (err) return <div className="px-4 sm:px-6 lg:px-8 py-10 text-rose-600">{err}</div>;
 
   return (
-    <div className="space-y-6 m-10">
-      {/* top header */}
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-[220px]">
-            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-[#142768] ring-1 ring-inset ring-indigo-100">
-              Notary Dashboard
-            </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="space-y-10">
+        {/* HEADER */}
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div className="px-6 sm:px-8 py-7">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
+                  Notary Services
+                </h1>
+                <p className="mt-2 text-sm text-gray-600 max-w-2xl leading-relaxed">
+                  Track notarization requests, payment status, and completed documents.
+                </p>
+              </div>
 
-            <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-gray-900">
-              Notary Services
-            </h1>
-
-            <p className="mt-1 text-sm text-gray-600">
-              Track notarization requests, payments, and final documents.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={load}
-              className="inline-flex items-center justify-center rounded-xl border bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 active:scale-[0.99]"
-            >
-              Refresh
-            </button>
-
-            <button
-              onClick={() => navigate("/notary/new")}
-              className="inline-flex items-center justify-center rounded-xl bg-[#142768] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-95 active:scale-[0.99]"
-            >
-              + New Request
-            </button>
-          </div>
-        </div>
-
-        {/* quick stats */}
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <StatCard label="Total" value={totals.total} />
-          <StatCard label="Paid" value={totals.paid} />
-          <StatCard label="Notarized" value={totals.notarized} />
-          <StatCard label="Verified" value={totals.verified} />
-        </div>
-      </div>
-
-      {/* table */}
-      <div className="rounded-2xl border bg-white shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b bg-white">
-          <div>
-            <div className="text-sm font-semibold text-gray-900">Requests</div>
-            <div className="text-xs text-gray-500">
-              Showing <span className="font-semibold text-gray-700">{items.length}</span>{" "}
-              {items.length === 1 ? "record" : "records"}
-            </div>
-          </div>
-
-          <div className="text-xs text-gray-500">
-            Tip: Scroll horizontally on small screens →
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="min-w-[980px] w-full text-sm">
-            <thead className="sticky top-0 z-10 bg-gray-50/95 backdrop-blur border-b">
-              <tr className="text-xs uppercase tracking-wide text-gray-600">
-                <th className="px-4 sm:px-6 py-3 text-left font-semibold">Title</th>
-                <th className="px-4 py-3 text-left font-semibold">Type</th>
-                <th className="px-4 py-3 text-left font-semibold">Urgency</th>
-                <th className="px-4 py-3 text-left font-semibold">Client</th>
-                <th className="px-4 py-3 text-left font-semibold">Lawyer</th>
-                <th className="px-4 py-3 text-left font-semibold">Payment</th>
-                <th className="px-4 py-3 text-left font-semibold">Status</th>
-                <th className="px-4 py-3 text-left font-semibold">Created</th>
-                <th className="px-4 sm:px-6 py-3 text-right font-semibold">Action</th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y">
-              {items.map((n, idx) => (
-                <tr
-                  key={n.notary_id}
-                  className={[
-                    "transition-colors",
-                    idx % 2 === 0 ? "bg-white" : "bg-gray-50/40",
-                    "hover:bg-indigo-50/40",
-                  ].join(" ")}
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                <button
+                  onClick={load}
+                  className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 >
-                  <td className="px-4 sm:px-6 py-4">
-                    <div className="font-semibold text-gray-900 leading-5">
-                      {n.title || "—"}
-                    </div>
-                    <div className="mt-0.5 text-xs text-gray-500">
-                      ID: <span className="font-medium text-gray-700">#{n.notary_id}</span>
-                    </div>
-                  </td>
+                  Refresh
+                </button>
 
-                  <td className="px-4 py-4">
-                    <span className="inline-flex items-center rounded-lg bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700 ring-1 ring-inset ring-gray-200">
-                      {n.doc_type || "—"}
-                    </span>
-                  </td>
+                <button
+                  onClick={() => navigate("/notary/new")}
+                  className="inline-flex items-center justify-center rounded-xl bg-[#142768] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                >
+                  + New Request
+                </button>
+              </div>
+            </div>
 
-                  <td className="px-4 py-4">
-                    <span
-                      className={[
-                        "inline-flex items-center rounded-lg px-2 py-1 text-xs font-semibold ring-1 ring-inset",
-                        String(n.urgency || "").toLowerCase() === "urgent"
-                          ? "bg-rose-50 text-rose-700 ring-rose-200"
-                          : String(n.urgency || "").toLowerCase() === "high"
-                          ? "bg-amber-50 text-amber-700 ring-amber-200"
-                          : "bg-emerald-50 text-emerald-700 ring-emerald-200",
-                      ].join(" ")}
-                    >
-                      {(n.urgency || "—").toString().replace(/_/g, " ")}
-                    </span>
-                  </td>
+            {/* STATS */}
+            <div className="mt-7 grid grid-cols-2 sm:grid-cols-4 gap-5">
+              <StatCard label="Total" value={totals.total} />
+              <StatCard label="Paid" value={totals.paid} />
+              <StatCard label="Notarized" value={totals.notarized} />
+              <StatCard label="Verified" value={totals.verified} />
+            </div>
+          </div>
+        </div>
 
-                  <td className="px-4 py-4 text-gray-700">
-                    {n.client_name || n.client_id || "—"}
-                  </td>
+        {/* TABLE */}
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div className="px-6 sm:px-8 py-5 border-b border-gray-100">
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <div className="text-sm font-semibold text-gray-900">Requests</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Showing <span className="font-semibold text-gray-700">{items.length}</span>{" "}
+                  {items.length === 1 ? "record" : "records"}
+                </div>
+              </div>
+            </div>
+          </div>
 
-                  <td className="px-4 py-4 text-gray-700">
-                    {n.lawyer_name || (n.lawyer_id ? `#${n.lawyer_id}` : "—")}
-                  </td>
-
-                  <td className="px-4 py-4">
-                    <span
-                      className={[
-                        "inline-flex items-center rounded-lg px-2 py-1 text-xs font-semibold ring-1 ring-inset whitespace-nowrap",
-                        String(n.payment_status || "").toLowerCase() === "paid"
-                          ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                          : "bg-gray-50 text-gray-700 ring-gray-200",
-                      ].join(" ")}
-                    >
-                      {(n.payment_status || "—").toString().replace(/_/g, " ")}
-                    </span>
-                  </td>
-
-                  <td className="px-4 py-4">
-                    <span className={badge(n.status)}>
-                      {(n.status || "—").toString().replace(/_/g, " ")}
-                    </span>
-                  </td>
-
-                  <td className="px-4 py-4 text-gray-700">{formatDate(n.created_at)}</td>
-
-                  <td className="px-4 sm:px-6 py-4 text-right">
-                    <Link
-                      to={`/notary/${n.notary_id}`}
-                      className="inline-flex items-center justify-center rounded-xl border bg-white px-3 py-2 text-sm font-semibold text-[#142768] shadow-sm hover:bg-gray-50 active:scale-[0.99]"
-                    >
-                      View <span className="ml-1">→</span>
-                    </Link>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-[1100px] w-full text-sm">
+              <thead className="sticky top-0 z-10 bg-gray-50/95 backdrop-blur border-b border-gray-200">
+                <tr className="text-[11px] uppercase tracking-wider text-gray-600">
+                  <th className="px-6 sm:px-8 py-4 text-left font-semibold">Title</th>
+                  <th className="px-6 py-4 text-left font-semibold">Type</th>
+                  <th className="px-6 py-4 text-left font-semibold">Urgency</th>
+                  <th className="px-6 py-4 text-left font-semibold">Client</th>
+                  <th className="px-6 py-4 text-left font-semibold">Lawyer</th>
+                  <th className="px-6 py-4 text-left font-semibold">Payment</th>
+                  <th className="px-6 py-4 text-left font-semibold">Status</th>
+                  <th className="px-6 py-4 text-left font-semibold">Created</th>
+                  <th className="px-6 sm:px-8 py-4 text-right font-semibold">Action</th>
                 </tr>
-              ))}
+              </thead>
 
-              {!items.length ? (
-                <tr>
-                  <td colSpan={9} className="px-6 py-16 text-center">
-                    <div className="mx-auto max-w-md">
-                      <div className="text-lg font-semibold text-gray-900">
-                        No notary requests found
+              <tbody className="divide-y divide-gray-100">
+                {items.map((n, i) => (
+                  <tr
+                    key={n.notary_id}
+                    className={[
+                      "transition-colors",
+                      i % 2 ? "bg-gray-50/40" : "bg-white",
+                      "hover:bg-indigo-50/40",
+                    ].join(" ")}
+                  >
+                    <td className="px-6 sm:px-8 py-5">
+                      <div className="min-w-0">
+                        <div className="font-semibold text-gray-900 truncate">
+                          {n.title || "—"}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          ID: <span className="font-medium text-gray-700">#{n.notary_id}</span>
+                        </div>
                       </div>
-                      <div className="mt-1 text-sm text-gray-500">
-                        Create your first request to start tracking notarization.
-                      </div>
-                      <div className="mt-5">
-                        <button
-                          onClick={() => navigate("/notary/new")}
-                          className="inline-flex items-center justify-center rounded-xl bg-[#142768] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-95 active:scale-[0.99]"
-                        >
-                          + New Request
-                        </button>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
+                    </td>
+
+                    <td className="px-6 py-5">
+                      <span className="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700 ring-1 ring-inset ring-gray-200 whitespace-nowrap">
+                        {n.doc_type || "—"}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-5">
+                      <span className="inline-flex items-center rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 ring-1 ring-inset ring-gray-200 whitespace-nowrap capitalize">
+                        {(n.urgency || "—").toString().replace(/_/g, " ")}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-5 text-gray-700 whitespace-nowrap">
+                      {n.client_name || n.client_id || "—"}
+                    </td>
+
+                    <td className="px-6 py-5 text-gray-700 whitespace-nowrap">
+                      {n.lawyer_name || (n.lawyer_id ? `#${n.lawyer_id}` : "—")}
+                    </td>
+
+                    <td className="px-6 py-5">
+                      <span
+                        className={[
+                          "inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold ring-1 ring-inset whitespace-nowrap",
+                          String(n.payment_status || "").toLowerCase() === "paid"
+                            ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
+                            : "bg-gray-50 text-gray-700 ring-gray-200",
+                        ].join(" ")}
+                      >
+                        {(n.payment_status || "—").toString().replace(/_/g, " ")}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-5">
+                      <span className={badge(n.status)}>
+                        {(n.status || "—").toString().replace(/_/g, " ")}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-5 text-gray-700 whitespace-nowrap">
+                      {formatDate(n.created_at)}
+                    </td>
+
+                    <td className="px-6 sm:px-8 py-5 text-right">
+                      <Link
+                        to={`/notary/${n.notary_id}`}
+                        className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-[#142768] shadow-sm hover:bg-gray-50 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                      >
+                        View <span className="ml-1">→</span>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+
+                {!items.length && (
+                  <tr>
+                    <td colSpan={9} className="px-8 py-16 text-center text-gray-500">
+                      No notary requests found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* bottom padding */}
+          <div className="h-2 bg-white" />
         </div>
       </div>
     </div>
@@ -308,22 +235,13 @@ const NotaryList = () => {
 };
 
 const StatCard = ({ label, value }) => (
-  <div className="group relative overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md">
-    {/* subtle top highlight */}
-    <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-200 via-transparent to-indigo-200 opacity-60" />
-
+  <div className="rounded-2xl border border-gray-200 bg-white px-6 py-5 shadow-sm">
     <div className="text-xs font-semibold text-gray-500">{label}</div>
-    <div className="mt-1 flex items-baseline gap-2">
-      <div className="text-2xl font-extrabold tracking-tight text-gray-900">
-        {value}
-      </div>
-      <div className="text-xs text-gray-400">count</div>
+    <div className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900">
+      {value}
     </div>
-
     <div className="mt-3 h-px bg-gray-100" />
-    <div className="mt-3 text-xs text-gray-500">
-      Updated from latest fetch
-    </div>
+    <div className="mt-3 text-xs text-gray-500">Updated 3 seconds ago...</div>
   </div>
 );
 
