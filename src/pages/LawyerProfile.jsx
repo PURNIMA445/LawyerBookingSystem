@@ -111,7 +111,6 @@ const LawyerProfile = () => {
     appointments: [],
     cases: [],
     documents: [],
-    messages: [],
   });
 
   const [loading, setLoading] = useState(true);
@@ -239,7 +238,6 @@ const LawyerProfile = () => {
       { key: "appointments", label: "Appointments" },
       { key: "cases", label: "Case History" },
       { key: "documents", label: "Documents" },
-      { key: "messages", label: "Messages" },
     ];
 
     if (showMessagesTab) base.push({ key: "messages", label: "Messages" });

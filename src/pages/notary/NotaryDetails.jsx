@@ -1,12 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_SERVER } from "../../api/http";
-import { getNotaryById, notarizeNotary, payNotary, verifyNotary } from "../../api/notaryApi";
+import {
+  claimNotary, // ✅ NEW
+  getNotaryById,
+  notarizeNotary,
+  payNotary,
+  verifyNotary,
+} from "../../api/notaryApi";
 
 /* ===== auth helpers (same style you used) ===== */
 const getAuthUser = () => {
   try {
     const raw =
+      localStorage.getItem("auth") ||
       localStorage.getItem("authUser") ||
       localStorage.getItem("user") ||
       localStorage.getItem("currentUser");
@@ -17,7 +24,14 @@ const getAuthUser = () => {
     return null;
   }
 };
+
 const getAuthRole = () => String(getAuthUser()?.role || "").toLowerCase();
+
+const getAuthUserId = () => {
+  const u = getAuthUser();
+  const id = u?.user_id ?? u?.id ?? u?._id ?? null;
+  return id != null ? Number(id) : null;
+};
 
 /* ===== helpers ===== */
 
@@ -35,7 +49,11 @@ const formatDate = (d) => {
   if (!d) return "—";
   const dt = new Date(d);
   if (Number.isNaN(dt.getTime())) return String(d);
-  return dt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  return dt.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 };
 
 const badge = (status) => {
@@ -53,12 +71,15 @@ const badge = (status) => {
   return `${base} bg-gray-50 text-gray-700 ring-gray-200`;
 };
 
-const pill = "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset whitespace-nowrap";
+const pill =
+  "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset whitespace-nowrap";
 
 const NotaryDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const role = useMemo(() => getAuthRole(), []);
+  const authUserId = useMemo(() => getAuthUserId(), []);
 
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -89,21 +110,45 @@ const NotaryDetails = () => {
   const clientDocUrl = useMemo(() => toFileUrl(item?.client_document_path), [item]);
   const finalDocUrl = useMemo(() => toFileUrl(item?.notarized_document_path), [item]);
 
+  const statusLower = useMemo(() => String(item?.status || "").toLowerCase(), [item]);
+  const paymentLower = useMemo(() => String(item?.payment_status || "").toLowerCase(), [item]);
+
+  const isPaid = paymentLower === "paid";
+
+  const assignedLawyerId = useMemo(() => {
+    const v = item?.lawyer_id;
+    return v != null && v !== "" ? Number(v) : null;
+  }, [item]);
+
   const canPay = useMemo(() => {
     if (role !== "client") return false;
-    return String(item?.payment_status || "").toLowerCase() !== "paid";
-  }, [role, item]);
+    return paymentLower !== "paid";
+  }, [role, paymentLower]);
 
   const canVerify = useMemo(() => {
     if (role !== "client") return false;
-    return String(item?.status || "").toLowerCase() === "notarized" && Boolean(item?.notarized_document_path);
-  }, [role, item]);
+    return statusLower === "notarized" && Boolean(item?.notarized_document_path);
+  }, [role, statusLower, item]);
 
+  // ⭐ Lawyer can claim if: paid + unclaimed + not verified
+  const canClaim = useMemo(() => {
+    if (role !== "lawyer") return false;
+    if (!isPaid) return false;
+    if (statusLower === "verified") return false;
+
+    // allow claim only if unassigned
+    if (assignedLawyerId != null) return false;
+    return true;
+  }, [role, isPaid, statusLower, assignedLawyerId]);
+
+  // ✅ Lawyer can upload notarized only after claim (assigned to self) + paid
   const canUploadNotarized = useMemo(() => {
     if (role !== "lawyer") return false;
-    const paid = String(item?.payment_status || "").toLowerCase() === "paid";
-    return paid;
-  }, [role, item]);
+    if (!isPaid) return false;
+    if (!authUserId) return false;
+    if (assignedLawyerId == null) return false;
+    return Number(assignedLawyerId) === Number(authUserId);
+  }, [role, isPaid, authUserId, assignedLawyerId]);
 
   const onPay = async () => {
     setSaving(true);
@@ -129,6 +174,20 @@ const NotaryDetails = () => {
     }
   };
 
+  // ⭐ CLAIM
+  const onClaim = async () => {
+    setSaving(true);
+    setErr("");
+    try {
+      await claimNotary(id);
+      await load();
+    } catch (e) {
+      setErr(e?.message || "Failed to claim request");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const onUpload = async () => {
     if (!uploadFile) return;
     setSaving(true);
@@ -146,9 +205,24 @@ const NotaryDetails = () => {
     }
   };
 
-  if (loading) return <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">Loading notary request…</div>;
-  if (err) return <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-rose-600">{err}</div>;
-  if (!item) return <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">Notary request not found</div>;
+  if (loading)
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        Loading notary request…
+      </div>
+    );
+  if (err)
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-rose-600">
+        {err}
+      </div>
+    );
+  if (!item)
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        Notary request not found
+      </div>
+    );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -179,6 +253,17 @@ const NotaryDetails = () => {
                   <span className={`${pill} bg-gray-50 text-gray-700 ring-gray-200 capitalize`}>
                     payment: {String(item.payment_status || "—").replace(/_/g, " ")}
                   </span>
+
+                  {/* optional: claim indicator */}
+                  {assignedLawyerId ? (
+                    <span className={`${pill} bg-blue-50 text-blue-700 ring-blue-200`}>
+                      claimed
+                    </span>
+                  ) : (
+                    <span className={`${pill} bg-gray-50 text-gray-700 ring-gray-200`}>
+                      unclaimed
+                    </span>
+                  )}
                 </div>
 
                 <p className="mt-3 text-sm text-gray-600 leading-relaxed">
@@ -195,6 +280,18 @@ const NotaryDetails = () => {
                 >
                   Refresh
                 </button>
+
+                {/* ⭐ LAWYER CLAIM */}
+                {canClaim ? (
+                  <button
+                    onClick={onClaim}
+                    disabled={saving}
+                    className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95 disabled:opacity-60 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                    title="Claim request and start review"
+                  >
+                    ⭐ Claim Request
+                  </button>
+                ) : null}
 
                 {canPay ? (
                   <button
@@ -231,7 +328,8 @@ const NotaryDetails = () => {
                 <a
                   href={clientDocUrl}
                   className="text-sm font-semibold text-[#142768] hover:underline"
-                  download = {clientDocUrl}
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   Download →
                 </a>
@@ -259,9 +357,7 @@ const NotaryDetails = () => {
                     <div className="text-sm font-semibold text-gray-900">
                       {isPdf(clientDocUrl) ? "Open PDF Preview" : "Open Document"}
                     </div>
-                    <div className="mt-1 text-xs text-gray-500">
-                      Click to preview in modal
-                    </div>
+                    <div className="mt-1 text-xs text-gray-500">Click to preview in modal</div>
                   </div>
                 )}
                 <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3 text-xs text-gray-500">
@@ -310,9 +406,7 @@ const NotaryDetails = () => {
                     <div className="text-sm font-semibold text-gray-900">
                       {isPdf(finalDocUrl) ? "Open PDF Preview" : "Open Document"}
                     </div>
-                    <div className="mt-1 text-xs text-gray-500">
-                      Click to preview in modal
-                    </div>
+                    <div className="mt-1 text-xs text-gray-500">Click to preview in modal</div>
                   </div>
                 )}
                 <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3 text-xs text-gray-500">
@@ -322,21 +416,33 @@ const NotaryDetails = () => {
               </button>
             )}
 
-            {canUploadNotarized ? (
+            {role === "lawyer" ? (
               <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-5">
                 <div className="text-sm font-semibold text-gray-900">Lawyer Upload</div>
-                <p className="text-xs text-gray-600 mt-1">Upload notarized image or PDF.</p>
+
+                {assignedLawyerId == null ? (
+                  <p className="text-xs text-amber-700 mt-1">
+                    ⭐ Claim the request first to upload notarized document.
+                  </p>
+                ) : Number(assignedLawyerId) !== Number(authUserId) ? (
+                  <p className="text-xs text-rose-700 mt-1">
+                    This request is claimed by another lawyer.
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-600 mt-1">Upload notarized image or PDF.</p>
+                )}
 
                 <input
                   type="file"
                   accept="image/*,application/pdf"
                   onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
                   className="mt-4 w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  disabled={!canUploadNotarized}
                 />
 
                 <button
                   onClick={onUpload}
-                  disabled={!uploadFile || saving}
+                  disabled={!uploadFile || saving || !canUploadNotarized}
                   className="mt-4 inline-flex w-full sm:w-auto items-center justify-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95 disabled:opacity-60 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-blue-200"
                 >
                   Upload Notarized Document
@@ -357,7 +463,10 @@ const NotaryDetails = () => {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <Info label="Notary ID" value={item.notary_id} />
               <Info label="Client" value={item.client_name || item.client_id} />
-              <Info label="Lawyer" value={item.lawyer_name || (item.lawyer_id ? `#${item.lawyer_id}` : "—")} />
+              <Info
+                label="Lawyer"
+                value={item.lawyer_name || (item.lawyer_id ? `#${item.lawyer_id}` : "—")}
+              />
               <Info label="Payment Ref" value={item.payment_ref || "—"} />
               <Info label="Updated" value={formatDate(item.updated_at)} />
               <Info label="Amount" value={`Rs. ${Number(item.amount || 0).toFixed(2)}`} />
@@ -418,10 +527,7 @@ const EmptyState = ({ text }) => (
 const Modal = ({ title, onClose, children }) => (
   <div className="fixed inset-0 z-50">
     {/* overlay */}
-    <div
-      className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
-      onClick={onClose}
-    />
+    <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" onClick={onClose} />
 
     {/* panel */}
     <div className="relative h-full w-full p-4 sm:p-6 flex items-center justify-center">

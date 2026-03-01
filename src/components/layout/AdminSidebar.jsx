@@ -50,8 +50,11 @@ const AdminSidebar = () => {
           <NavLink to="/admin/appointments" className={linkClass}>
             <span>📅</span> Appointments
           </NavLink>
+          <NavLink to="/admin/notary" className={linkClass}>
+            <span>📃</span> Notary
+          </NavLink>
 
-          <NavLink to="/admin/admins" className={linkClass}>
+          <NavLink to="/admin/n" className={linkClass}>
             <span>🛡️</span> Admins
           </NavLink>
         </nav>

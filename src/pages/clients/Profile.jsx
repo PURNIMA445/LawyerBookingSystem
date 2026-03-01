@@ -88,15 +88,15 @@ const Profile = () => {
                         <div className="mt-4 grid sm:grid-cols-3 gap-3 text-sm">
                             <div className="border rounded-xl p-3">
                                 <div className="text-gray-500">Your Proposed</div>
-                                <div className="font-semibold">${Number(a.proposed_fee || 0).toFixed(2)}</div>
+                                <div className="font-semibold">Rs.{Number(a.proposed_fee || 0).toFixed(2)}</div>
                             </div>
                             <div className="border rounded-xl p-3">
                                 <div className="text-gray-500">Lawyer Offer</div>
-                                <div className="font-semibold">${Number(a.offered_fee || 0).toFixed(2)}</div>
+                                <div className="font-semibold">Rs.{Number(a.offered_fee || 0).toFixed(2)}</div>
                             </div>
                             <div className="border rounded-xl p-3">
                                 <div className="text-gray-500">Final Fee</div>
-                                <div className="font-semibold">${Number(a.final_fee || 0).toFixed(2)}</div>
+                                <div className="font-semibold">Rs.{Number(a.final_fee || 0).toFixed(2)}</div>
                             </div>
                         </div>
 
@@ -106,7 +106,7 @@ const Profile = () => {
                                     onClick={() => acceptOffer(a.appointment_id)}
                                     className="bg-[#142768] text-white px-4 py-2 rounded-xl hover:opacity-95 transition"
                                 >
-                                    Accept Offer (${Number(a.offered_fee).toFixed(2)})
+                                    Accept Offer (Rs.{Number(a.offered_fee).toFixed(2)})
                                 </button>
 
                                 <input

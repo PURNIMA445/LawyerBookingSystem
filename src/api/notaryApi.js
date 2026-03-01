@@ -49,3 +49,10 @@ export const verifyNotary = (id) =>
     method: "POST",
     headers: authHeader(),
   });
+
+  export const claimNotary = (id) =>
+  http(`${API_SERVER}/api/notary/${id}/claim`, {
+    method: "POST",
+    headers: authHeader(),
+  });
+  

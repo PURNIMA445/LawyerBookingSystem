@@ -152,7 +152,7 @@ export default function TermsAndConditions() {
         </div>
 
         {/* Acceptance Checkbox */}
-        <div className="bg-white rounded-lg shadow-md p-6">
+        {/* <div className="bg-white rounded-lg shadow-md p-6">
           <label className="flex items-start gap-3 cursor-pointer">
             <input
               type="checkbox"
@@ -181,7 +181,7 @@ export default function TermsAndConditions() {
               Decline
             </button>
           </div>
-        </div>
+        </div> */}
 
       </main>
     </div>

@@ -85,7 +85,8 @@ const MyRoute = () => {
             <Route path="appointments" element={<AdminAppointments />} />
             <Route path="admins" element={<AdminAdmins />} />
             <Route path='clients/:clientId' element={<AdminClientProfile />} />
-
+            <Route path='notary' element={<NotaryList />} />
+            <Route path='notary/:id' element={<NotaryDetails />} />
           </Route>
         </Route>
 

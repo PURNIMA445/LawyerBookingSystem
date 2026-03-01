@@ -68,7 +68,7 @@ const NotaryList = () => {
   if (err) return <div className="px-4 sm:px-6 lg:px-8 py-10 text-rose-600">{err}</div>;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="space-y-10">
         {/* HEADER */}
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -125,7 +125,7 @@ const NotaryList = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-[1100px] w-full text-sm">
+            <table className="min-w-275 w-full text-sm">
               <thead className="sticky top-0 z-10 bg-gray-50/95 backdrop-blur border-b border-gray-200">
                 <tr className="text-[11px] uppercase tracking-wider text-gray-600">
                   <th className="px-6 sm:px-8 py-4 text-left font-semibold">Title</th>
