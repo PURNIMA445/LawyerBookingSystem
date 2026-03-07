@@ -9,6 +9,10 @@ import {
   verifyNotary,
 } from "../../api/notaryApi";
 
+import { initiateEsewa } from "../../api/paymentApi";
+
+
+
 /* ===== auth helpers (same style you used) ===== */
 const getAuthUser = () => {
   try {
@@ -151,6 +155,41 @@ const NotaryDetails = () => {
   }, [role, isPaid, authUserId, assignedLawyerId]);
 
   const onPay = async () => {
+    try {
+      const res = await initiateEsewa(id);
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form"; // sandbox
+
+      const fields = {
+        amount: res.amount,
+        tax_amount: "0",
+        total_amount: res.amount,
+        transaction_uuid: res.transaction_uuid,
+        product_code: res.product_code,
+        product_service_charge: "0",
+        product_delivery_charge: "0",
+        success_url: res.success_url,
+        failure_url: res.failure_url,
+        signed_field_names: "total_amount,transaction_uuid,product_code",
+        signature: res.signature,
+      };
+
+      Object.keys(fields).forEach((key) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = fields[key];
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+    } catch (e) {
+      setErr("Payment initialization failed");
+    }
+
     setSaving(true);
     try {
       await payNotary(id, { payment_ref: `MANUAL_${Date.now()}` }); // replace with gateway later
