@@ -24,7 +24,7 @@ export const getMyLawyerProfile = () =>
 
 // update profile (PUT /api/lawyers/me)
 export const updateMyLawyerProfile = (formData) =>
-  http(`${API_SERVER}/api/lawyers/me`, {
+  http(`${API_SERVER}/api/lawyers/me/profile`, {
     method: "PUT",
     headers: {
       ...authHeader(),
