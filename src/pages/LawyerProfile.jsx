@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getMyLawyerDashboard, getMyLawyerProfile } from "../api/lawyersApi";
+import { getLawyer, getMyLawyerDashboard, getMyLawyerProfile } from "../api/lawyersApi";
 import { API_SERVER } from "../api/http";
 // import { getMyLawyerDashboard } from "../../api/lawyersApi";
 // import { API_SERVER } from "../../api/http";
@@ -12,10 +12,7 @@ const getAuthUser = () => {
   try {
     // Common patterns
     const raw =
-      localStorage.getItem("auth") ||
-      localStorage.getItem("authUser") ||
-      localStorage.getItem("user") ||
-      localStorage.getItem("currentUser");
+      localStorage.getItem("auth");
 
     if (!raw) return null;
     const u = JSON.parse(raw);
@@ -154,9 +151,13 @@ const LawyerProfile = () => {
         // ✅ Admin viewing specific lawyer
         // Requires backend route + API method getLawyerDashboardById(lawyerId)
         res = await getMyLawyerDashboard(lawyerId);
-      } else {
+      } else if (isSelfView) {
         // ✅ Self lawyer dashboard
         res = await getMyLawyerProfile();
+      }
+      else {
+        // public view
+        res = await getLawyer(lawyerId);
       }
 
       setBundle({
@@ -333,6 +334,11 @@ const LawyerProfile = () => {
             ) : (
               // ✅ ADMIN VIEW: show only back button (optional)
               <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                <Link to={`/appointments/book/${lawyerId}`}
+                  className="px-4 py-2 rounded-lg border bg-white hover:bg-gray-50 transition"
+                >
+                  Book Lawyer
+                </Link>
                 <button
                   onClick={() => navigate(-1)}
                   className="px-4 py-2 rounded-lg border bg-white hover:bg-gray-50 transition"
@@ -353,11 +359,10 @@ const LawyerProfile = () => {
               <button
                 key={t.key}
                 onClick={() => setActiveTab(t.key)}
-                className={`px-4 py-2 rounded-lg whitespace-nowrap transition-all ${
-                  activeTab === t.key
+                className={`px-4 py-2 rounded-lg whitespace-nowrap transition-all ${activeTab === t.key
                     ? "bg-[#142768] text-white shadow"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 {t.label}
               </button>

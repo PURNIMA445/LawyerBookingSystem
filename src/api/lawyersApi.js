@@ -10,7 +10,7 @@ export const listLawyers = () =>
 
 // public profile by id
 export const getLawyer = (id) =>
-  http(`${API_SERVER}/api/lawyers/${id}`);
+  http(`${API_SERVER}/api/lawyers/dashboard/${id}`);
 
 /* =====================================================
    LAWYER — SELF ONLY

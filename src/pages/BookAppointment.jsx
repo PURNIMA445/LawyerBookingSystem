@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getLawyer } from "../api/lawyersApi";
 import { createAppointment } from "../api/appointmentsApi";
 
 const BookAppointment = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const q = new URLSearchParams(location.search);
-  const lawyerId = q.get("lawyerId");
+  const lawyerId = useParams()?.id
 
   const [lawyer, setLawyer] = useState(null);
   const [err, setErr] = useState("");

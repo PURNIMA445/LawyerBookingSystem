@@ -61,7 +61,7 @@ const MyRoute = () => {
           </Route>
 
           <Route path='/lawyers/:lawyerId' element={<AdminLawyerProfile />} />
-          <Route path='/bookappointment' element={<BookAppointment />} />
+          <Route path='/appointments/book/:id' element={<BookAppointment />} />
 
           <Route path="/notary" element={<NotaryList />} />
           <Route path="/notary/new" element={<NotaryCreate />} />

@@ -11,10 +11,7 @@ const getAuthUser = () => {
   try {
     // Common patterns
     const raw =
-      localStorage.getItem("authUser") ||
-      localStorage.getItem("user") ||
-      localStorage.getItem("currentUser");
-
+      localStorage.getItem("auth");
     if (!raw) return null;
     const u = JSON.parse(raw);
     return u && typeof u === "object" ? u : null;
