@@ -467,6 +467,7 @@ const LawyerProfile = () => {
                     <th className="text-left p-4 font-semibold text-gray-700">Subject</th>
                     <th className="text-left p-4 font-semibold text-gray-700">Status</th>
                     <th className="text-left p-4 font-semibold text-gray-700">Fee</th>
+                    <th className="text-left p-4 font-semibold text-gray-700">Action</th>
                   </tr>
                 </thead>
 
@@ -486,6 +487,9 @@ const LawyerProfile = () => {
                       </td>
                       <td className="p-4 font-semibold">
                         {feeFromAppt(a) != null ? formatMoney(feeFromAppt(a)) : "—"}
+                      </td>
+                      <td>
+                        <Link to={`/lawyer/appointments/${a.appointment_id}`}>View Details</Link>
                       </td>
                     </tr>
                   ))}
