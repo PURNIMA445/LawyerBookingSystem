@@ -36,6 +36,7 @@ import ChatPage from "./chatapp/ChatPage";
 import NotaryDetails from './pages/notary/NotaryDetails'
 import NotaryCreate from './pages/notary/NotaryCreate'
 import NotaryList from './pages/notary/NotaryList'
+import AdminAppointmentDetails from './pages/admin/AdminAppointmentDetails'
 const MyRoute = () => {
   return (
 
@@ -83,6 +84,7 @@ const MyRoute = () => {
             <Route path="lawyers" element={<AdminLawyers />} />
             <Route path='lawyers/:lawyerId' element={<AdminLawyerProfile />} />
             <Route path="appointments" element={<AdminAppointments />} />
+            <Route path='appointments/:id' element = {<AdminAppointmentDetails/>}/>
             <Route path="admins" element={<AdminAdmins />} />
             <Route path='clients/:clientId' element={<AdminClientProfile />} />
             <Route path='notary' element={<NotaryList />} />

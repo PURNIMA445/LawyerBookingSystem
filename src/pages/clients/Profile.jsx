@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { clientConfirm, clientCounter, myAppointments } from "../../api/appointmentsApi";
 import { Link } from "react-router-dom";
 import NegotiationChat from "../../components/layout/NegotiationChat";
+import axios from "axios";
+import { initiateAppointmentEsewa } from "../../api/paymentApi";
+
+const API = import.meta.env.VITE_API_SERVER_URL
 
 
 const Profile = () => {
@@ -9,6 +13,8 @@ const Profile = () => {
     const [err, setErr] = useState("");
     const [loading, setLoading] = useState(true);
     const [counterMap, setCounterMap] = useState({});
+      const [saving, setSaving] = useState(false);
+    
 
     const load = async () => {
         try {
@@ -45,6 +51,55 @@ const Profile = () => {
         }
     };
 
+    const handlePay = async (id) => {
+        try {
+
+            const res = await initiateAppointmentEsewa(id);
+
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form"; // sandbox
+
+            const fields = {
+                amount: res.amount,
+                tax_amount: "0",
+                total_amount: res.amount,
+                transaction_uuid: res.transaction_uuid,
+                product_code: res.product_code,
+                product_service_charge: "0",
+                product_delivery_charge: "0",
+                success_url: res.success_url,
+                failure_url: res.failure_url,
+                signed_field_names: "total_amount,transaction_uuid,product_code",
+                signature: res.signature,
+            };
+
+            Object.keys(fields).forEach((key) => {
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = key;
+                input.value = fields[key];
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+        } catch (e) {
+            setErr(e.message);
+        }
+
+        setSaving(true);
+        // try {
+        //     await payNotary(id, { payment_ref: `MANUAL_${Date.now()}` }); // replace with gateway later
+        //     await load();
+        // } catch (e) {
+        //     setErr(e?.message || "Payment failed");
+        // } finally {
+        //     setSaving(false);
+        // }
+
+    };
+
     if (loading) return <div className="p-6">Loading profile...</div>;
 
     return (
@@ -76,13 +131,24 @@ const Profile = () => {
                                 {a.details ? <div className="text-sm text-gray-700 mt-2">{a.details}</div> : null}
                             </div>
 
-                            <div className={`text-xs px-3 py-1 rounded-full ${a.status === "approved" ? "bg-green-100 text-green-700" :
-                                    a.status === "rejected" ? "bg-red-100 text-red-700" :
-                                        a.status === "negotiating" ? "bg-yellow-100 text-yellow-700" :
-                                            "bg-blue-100 text-blue-700"
-                                }`}>
-                                {a.status}
-                            </div>
+                            {
+                                a.status === 'awaiting_payment' ?
+                                    <button
+                                        onClick={() => handlePay(a.appointment_id)}
+                                        className="px-4 py-2 bg-green-600 text-white rounded-lg"
+                                    >
+                                        Pay Now
+                                    </button>
+                                    :
+                                    <div className={`text-xs px-3 py-1 rounded-full ${a.status === "approved" ? "bg-green-100 text-green-700" :
+                                        a.status === "rejected" ? "bg-red-100 text-red-700" :
+                                            a.status === "negotiating" ? "bg-yellow-100 text-yellow-700" :
+                                                "bg-blue-100 text-blue-700"
+                                        }`}>
+                                        {a.status}
+                                    </div>
+                            }
+
                         </div>
 
                         <div className="mt-4 grid sm:grid-cols-3 gap-3 text-sm">

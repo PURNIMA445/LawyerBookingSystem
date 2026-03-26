@@ -9,3 +9,13 @@ export const initiateEsewa = (notary_id) =>
     },
     body: JSON.stringify({ notary_id }),
   });
+
+export const initiateAppointmentEsewa = (appointment_id) =>
+  http(`${API_SERVER}/api/payment/appointment/esewa/initiate`, {
+    method: "POST",
+    headers: {
+      ...authHeader(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ appointment_id }),
+  });

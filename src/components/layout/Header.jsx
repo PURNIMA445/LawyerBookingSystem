@@ -232,6 +232,7 @@ const Navbar = () => {
             to="/"
             className="text-xl font-bold tracking-wide text-[#142768] absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0"
           >
+            <img src={'./favicon.png'} alt="" className="h-20 inline mr-5" />
             HireLawyer
           </Link>
 

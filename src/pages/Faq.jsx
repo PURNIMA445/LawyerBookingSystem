@@ -259,9 +259,12 @@ const FAQ = () => {
                   </div>
                   <h4 className="font-semibold text-lg mb-2">Still have questions?</h4>
                   <p className="text-slate-400 text-sm mb-4">Our support team is here to help you 24/7</p>
+                  <a href='tel:+9779800000001'>
                   <button className="w-full py-3 bg-[#142768] hover:bg-indigo-600 rounded-xl font-medium transition-colors duration-300">
                     Contact Support
                   </button>
+
+                  </a>
                 </div>
               </div>
             </div>

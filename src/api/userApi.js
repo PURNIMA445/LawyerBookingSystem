@@ -63,3 +63,4 @@ export const keepLoggedIn = (data) => {
 export const isLoggedIn = () => {
     return (localStorage.getItem('auth') ? JSON.parse(localStorage.getItem('auth')) : false)
 }
+
