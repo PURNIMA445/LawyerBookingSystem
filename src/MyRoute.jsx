@@ -37,6 +37,7 @@ import NotaryDetails from './pages/notary/NotaryDetails'
 import NotaryCreate from './pages/notary/NotaryCreate'
 import NotaryList from './pages/notary/NotaryList'
 import AdminAppointmentDetails from './pages/admin/AdminAppointmentDetails'
+import ResetPassword from './pages/ResetPassword'
 const MyRoute = () => {
   return (
 
@@ -52,6 +53,7 @@ const MyRoute = () => {
           <Route path='/contact' element={<Contact />} />
           <Route path='/terms' element={<TermsAndConditions />} />
           <Route path='/login' element={<Login />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path='/signup' element={<SignUp />} />
           <Route path="/services/:id" element={<ServiceDetailsPage />} />
 
