@@ -2,77 +2,41 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { listLawyers } from "../api/lawyersApi";
 
-/* ---------------- DUMMY LAWYERS (NEPAL) ---------------- */
-const dummyLawyers = [
-  {
-    lawyer_id: "d1",
-    full_name: "Adv. Ramesh Adhikari",
-    specialization: "Family Law",
-    experience_years: 12,
-    hourly_rate: 2500,
-    is_verified: 1,
-    availability: "unavailable",
-  },
-  {
-    lawyer_id: "d2",
-    full_name: "Adv. Sita Koirala",
-    specialization: "Criminal Law",
-    experience_years: 18,
-    hourly_rate: 4000,
-    is_verified: 1,
-    availability: "unavailable",
-  },
-  {
-    lawyer_id: "d3",
-    full_name: "Adv. Bikash Shrestha",
-    specialization: "Corporate Law",
-    experience_years: 9,
-    hourly_rate: 3000,
-    is_verified: 1,
-    availability: "unavailable",
-  },
-  {
-    lawyer_id: "d4",
-    full_name: "Adv. Anjana Thapa",
-    specialization: "Property Law",
-    experience_years: 15,
-    hourly_rate: 3500,
-    is_verified: 1,
-    availability: "unavailable",
-  },
-  {
-    lawyer_id: "d5",
-    full_name: "Adv. Nabin Poudel",
-    specialization: "Tax Law",
-    experience_years: 22,
-    hourly_rate: 5000,
-    is_verified: 1,
-    availability: "unavailable",
-  },
-];
-
 export default function Lawyers() {
-  const [dbLawyers, setDbLawyers] = useState([]);
+  const [lawyers, setLawyers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [filters, setFilters] = useState({
-    experienceMin: 1,
-    experienceMax: 40,
-    feeMin: "",
-    feeMax: "",
+    search: "",
+    experienceMin: 0,
+    experienceMax: 50,
+    rateMin: "",
+    rateMax: "",
     specialization: [],
+    sortBy: "name",
+    sortOrder: "asc",
   });
 
-  /* ---------------- FETCH DB LAWYERS ---------------- */
   useEffect(() => {
     (async () => {
       try {
         const data = await listLawyers();
-        const normalized = (data || []).map(l => ({
-          ...l,
-          availability: "available",
+        const arr = Array.isArray(data)
+          ? data
+          : data?.lawyers || data?.data || [];
+
+        const normalized = arr.map(l => ({
+          lawyer_id: l.lawyer_id || l._id,
+          full_name: l.full_name || "",
+          specialization: Array.isArray(l.specialization)
+            ? l.specialization
+            : [l.specialization],
+          experience_years: Number(l.experience_years) || 0,
+          hourly_rate: Number(l.hourly_rate) || 0,
+          availability: l.availability || "available",
         }));
-        setDbLawyers(normalized);
+
+        setLawyers(normalized);
       } catch (err) {
         console.error(err);
       } finally {
@@ -81,40 +45,63 @@ export default function Lawyers() {
     })();
   }, []);
 
-  /* ---------------- MERGE DATA ---------------- */
-  const allLawyers = useMemo(
-    () => [...dbLawyers, ...dummyLawyers],
-    [dbLawyers]
-  );
-
-  /* ---------------- SPECIALIZATIONS ---------------- */
   const specializations = useMemo(() => {
     const set = new Set();
-    allLawyers.forEach(l => l.specialization && set.add(l.specialization));
+    lawyers.forEach(l =>
+      l.specialization.forEach(s => s && set.add(s))
+    );
     return Array.from(set);
-  }, [allLawyers]);
+  }, [lawyers]);
 
-  /* ---------------- FILTER LOGIC ---------------- */
-  const filteredLawyers = useMemo(() => {
-    return allLawyers.filter(l => {
-      if (!Number(l.is_verified)) return false;
+  const filtered = useMemo(() => {
+    let result = [...lawyers];
 
-      if (
-        l.experience_years < filters.experienceMin ||
-        l.experience_years > filters.experienceMax
-      ) return false;
+    if (filters.search) {
+      result = result.filter(l =>
+        l.full_name.toLowerCase().includes(filters.search.toLowerCase())
+      );
+    }
 
-      if (filters.feeMin && l.hourly_rate < Number(filters.feeMin)) return false;
-      if (filters.feeMax && l.hourly_rate > Number(filters.feeMax)) return false;
+    result = result.filter(l =>
+      l.experience_years >= filters.experienceMin &&
+      l.experience_years <= filters.experienceMax
+    );
 
-      if (
-        filters.specialization.length &&
-        !filters.specialization.includes(l.specialization)
-      ) return false;
+    if (filters.rateMin)
+      result = result.filter(l => l.hourly_rate >= Number(filters.rateMin));
 
-      return true;
+    if (filters.rateMax)
+      result = result.filter(l => l.hourly_rate <= Number(filters.rateMax));
+
+    if (filters.specialization.length) {
+      result = result.filter(l =>
+        l.specialization.some(s =>
+          filters.specialization.includes(s)
+        )
+      );
+    }
+
+    result.sort((a, b) => {
+      let valA, valB;
+
+      if (filters.sortBy === "name") {
+        valA = a.full_name.toLowerCase();
+        valB = b.full_name.toLowerCase();
+      } else if (filters.sortBy === "experience") {
+        valA = a.experience_years;
+        valB = b.experience_years;
+      } else {
+        valA = a.hourly_rate;
+        valB = b.hourly_rate;
+      }
+
+      if (valA < valB) return filters.sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return filters.sortOrder === "asc" ? 1 : -1;
+      return 0;
     });
-  }, [allLawyers, filters]);
+
+    return result;
+  }, [lawyers, filters]);
 
   const toggleSpec = (spec) => {
     setFilters(prev => ({
@@ -126,67 +113,65 @@ export default function Lawyers() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+      <div className="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-10">
 
-        {/* ---------------- FILTER SIDEBAR ---------------- */}
-        <aside className="md:col-span-1 space-y-8">
+        {/* SIDEBAR */}
+        <aside className="space-y-6 sticky top-2/12 h-fit bg-white/70 backdrop-blur-xl p-5 rounded-2xl shadow-sm border border-slate-200">
 
-          <div>
-            <h3 className="font-semibold mb-3">Experience (Years)</h3>
-            <div className="flex gap-3">
-              <input
-                type="number"
-                min="1"
-                max="40"
-                value={filters.experienceMin}
-                onChange={e =>
-                  setFilters(f => ({ ...f, experienceMin: Number(e.target.value) }))
-                }
-                className="w-full border rounded-lg px-3 py-2"
-              />
-              <input
-                type="number"
-                min="1"
-                max="40"
-                value={filters.experienceMax}
-                onChange={e =>
-                  setFilters(f => ({ ...f, experienceMax: Number(e.target.value) }))
-                }
-                className="w-full border rounded-lg px-3 py-2"
-              />
-            </div>
-          </div>
+          <input
+            type="text"
+            placeholder="🔍 Search lawyers..."
+            value={filters.search}
+            onChange={e => setFilters(f => ({ ...f, search: e.target.value }))}
+            className="w-full border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-[#142768] outline-none"
+          />
 
           <div>
-            <h3 className="font-semibold mb-3">Hourly Rate (Rs.)</h3>
-            <div className="flex gap-3">
+            <h3 className="font-semibold mb-2 text-slate-700">Experience</h3>
+            <div className="flex gap-2">
               <input
                 type="number"
                 placeholder="Min"
-                value={filters.feeMin}
-                onChange={e =>
-                  setFilters(f => ({ ...f, feeMin: e.target.value }))
-                }
-                className="w-full border rounded-lg px-3 py-2"
+                value={filters.experienceMin}
+                onChange={e => setFilters(f => ({ ...f, experienceMin: Number(e.target.value) }))}
+                className="w-full border rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-400"
               />
               <input
                 type="number"
                 placeholder="Max"
-                value={filters.feeMax}
-                onChange={e =>
-                  setFilters(f => ({ ...f, feeMax: e.target.value }))
-                }
-                className="w-full border rounded-lg px-3 py-2"
+                value={filters.experienceMax}
+                onChange={e => setFilters(f => ({ ...f, experienceMax: Number(e.target.value) }))}
+                className="w-full border rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-400"
               />
             </div>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-3">Field of Expertise</h3>
-            <div className="space-y-2">
+            <h3 className="font-semibold mb-2 text-slate-700">Rate (Rs)</h3>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                placeholder="Min"
+                value={filters.rateMin}
+                onChange={e => setFilters(f => ({ ...f, rateMin: e.target.value }))}
+                className="w-full border rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-400"
+              />
+              <input
+                type="number"
+                placeholder="Max"
+                value={filters.rateMax}
+                onChange={e => setFilters(f => ({ ...f, rateMax: e.target.value }))}
+                className="w-full border rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-2 text-slate-700">Specialization</h3>
+            <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
               {specializations.map(spec => (
-                <label key={spec} className="flex items-center gap-2 text-sm">
+                <label key={spec} className="flex gap-2 text-sm cursor-pointer hover:text-blue-600">
                   <input
                     type="checkbox"
                     checked={filters.specialization.includes(spec)}
@@ -200,69 +185,97 @@ export default function Lawyers() {
 
         </aside>
 
-        {/* ---------------- LAWYER CARDS ---------------- */}
-        <section className="md:col-span-3 grid sm:grid-cols-2 gap-5">
+        {/* RESULTS */}
+        <section className="md:col-span-3">
 
-          {loading && <p className="text-gray-500">Loading lawyers...</p>}
-
-          {!loading && filteredLawyers.length === 0 && (
-            <p className="text-gray-500">No lawyers found.</p>
-          )}
-
-          {filteredLawyers.map(l => (
-            <div
-              key={l.lawyer_id}
-              className="bg-white border rounded-2xl  shadow-sm hover:shadow-md transition h-56 p-7"
+          {/* SORT BAR */}
+          <div className="flex justify-end gap-3 mb-6">
+            <select
+              value={filters.sortBy}
+              onChange={e =>
+                setFilters(f => ({
+                  ...f,
+                  sortBy: e.target.value,
+                  sortOrder: "asc",
+                }))
+              }
+              className="border rounded-xl px-4 py-2 text-sm shadow-sm focus:ring-2 focus:ring-[#142768]"
             >
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="font-semibold text-lg">{l.full_name}</h3>
-                <span
-                  className={`text-xs px-2 py-1 rounded-full ${
-                    l.availability === "available"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {l.availability === "available" ? "Available" : "Unavailable"}
-                </span>
-              </div>
+              <option value="name">Name</option>
+              <option value="experience">Experience</option>
+              <option value="rate">Rate</option>
+            </select>
 
-              <p className="text-sm text-gray-600">{l.specialization}</p>
-              <p className="text-sm text-gray-600">
-                {l.experience_years} years experience
-              </p>
+            <select
+              value={filters.sortOrder}
+              onChange={e => setFilters(f => ({ ...f, sortOrder: e.target.value }))}
+              className="border rounded-xl px-4 py-2 text-sm shadow-sm focus:ring-2 focus:ring-[#142768]"
+            >
+              {filters.sortBy === "name" ? (
+                <>
+                  <option value="asc">A-Z</option>
+                  <option value="desc">Z-A</option>
+                </>
+              ) : (
+                <>
+                  <option value="asc">Lowest First</option>
+                  <option value="desc">Highest First</option>
+                </>
+              )}
+            </select>
+          </div>
 
-              <p className="mt-2 font-medium text-[#142768]">
-                Rs. {l.hourly_rate} / hour
-              </p>
+          {/* GRID */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
 
-              <div className="mt-4 flex gap-3">
-                <Link
-                  to={`/lawyers/${l.lawyer_id}`}
-                  className="flex-1 text-center border rounded-lg py-2 text-sm hover:bg-gray-50"
-                >
-                  View Profile
-                </Link>
+            {loading && <p className="text-gray-500">Loading...</p>}
+            {!loading && filtered.length === 0 && <p>No lawyers found</p>}
 
-                {l.availability === "available" ? (
+            {filtered.map(l => (
+              <div
+                key={l.lawyer_id}
+                className="group bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between min-h-[240px]"
+              >
+
+                <div>
+                  <h3 className="font-semibold text-lg text-slate-800 group-hover:text-[#142768] transition">
+                    {l.full_name}
+                  </h3>
+
+                  <p className="text-sm text-slate-500 mt-1 line-clamp-2">
+                    {l.specialization.join(", ")}
+                  </p>
+
+                  <p className="text-sm mt-2 text-slate-600">
+                    {l.experience_years} yrs experience
+                  </p>
+
+                  <p className="font-semibold mt-3 text-[#142768] text-lg">
+                    Rs. {l.hourly_rate}
+                    <span className="text-sm font-normal text-slate-500"> / hour</span>
+                  </p>
+                </div>
+
+                <div className="flex gap-2 mt-5">
+                  <Link
+                    to={`/lawyers/${l.lawyer_id}`}
+                    className="flex-1 text-center border border-slate-300 rounded-lg py-2 text-sm hover:bg-slate-50 transition"
+                  >
+                    Profile
+                  </Link>
+
                   <Link
                     to={`/appointments/book/${l.lawyer_id}`}
-                    className="flex-1 text-center bg-[#142768] text-white rounded-lg py-2 text-sm hover:opacity-90"
+                    className="flex-1 text-center bg-[#142768] text-white rounded-lg py-2 text-sm hover:bg-[#0f1d52] transition"
                   >
                     Book
                   </Link>
-                ) : (
-                  <button
-                    disabled
-                    className="flex-1 bg-gray-200 text-gray-500 rounded-lg py-2 text-sm cursor-not-allowed"
-                  >
-                    Unavailable
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+                </div>
 
+              </div>
+            ))}
+
+          </div>
         </section>
       </div>
     </div>

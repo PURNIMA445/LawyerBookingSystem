@@ -10,246 +10,161 @@ import NegotiationChat from "../../components/layout/NegotiationChat";
 
 const FINAL_STATUSES = ["approved", "rejected", "cancelled", "completed"];
 
-const statusPill = (status) => {
-  const s = String(status || "").toLowerCase();
-  if (s === "approved") return "bg-green-100 text-green-700";
-  if (s === "rejected") return "bg-red-100 text-red-700";
-  if (s === "negotiating") return "bg-yellow-100 text-yellow-700";
-  if (s === "cancelled") return "bg-gray-100 text-gray-700";
-  if (s === "completed") return "bg-indigo-100 text-indigo-700";
-  return "bg-blue-100 text-blue-700";
-};
-
 const money = (n) => `Rs. ${Number(n || 0).toFixed(2)}`;
 
 const AppointmentDetails = () => {
-  const { id } = useParams(); // /lawyer/appointments/:id
+  const { id } = useParams();
   const apptId = Number(id);
 
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
   const [appt, setAppt] = useState(null);
   const [offerFee, setOfferFee] = useState("");
+  const [file, setFile] = useState(null);
+  const [err, setErr] = useState("");
 
   const load = async () => {
-    try {
-      setLoading(true);
-      setErr("");
-
-      // we reuse myAppointments() and pick single appointment
-      const list = await myAppointments();
-      const found = Array.isArray(list)
-        ? list.find((x) => Number(x.appointment_id) === apptId)
-        : null;
-
-      if (!found) {
-        setAppt(null);
-        setErr("Appointment not found or you don't have access.");
-      } else {
-        setAppt(found);
-        setOfferFee(found.offered_fee ?? "");
-      }
-    } catch (e) {
-      setErr(e?.message || "Failed to load appointment");
-      setAppt(null);
-    } finally {
-      setLoading(false);
-    }
+    const list = await myAppointments();
+    const found = list.find(x => Number(x.appointment_id) === apptId);
+    setAppt(found);
+    setOfferFee(found?.offered_fee ?? "");
   };
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apptId]);
 
   const isFinal = useMemo(() => {
-    const s = String(appt?.status || "").toLowerCase();
-    return FINAL_STATUSES.includes(s);
-  }, [appt?.status]);
+    return FINAL_STATUSES.includes(appt?.status);
+  }, [appt]);
+
+  const isPaid = useMemo(() => {
+    return ["paid", "completed"].includes(appt?.status);
+  }, [appt]);
 
   const sendOffer = async () => {
-    try {
-      setErr("");
-      const offered_fee = Number(offerFee);
-      if (!Number.isFinite(offered_fee) || offered_fee <= 0) {
-        setErr("Please enter a valid offer amount.");
-        return;
-      }
-      await lawyerOffer(apptId, {
-        offered_fee,
-        negotiation_note: "Fee offer from lawyer",
-      });
-      await load();
-    } catch (e) {
-      setErr(e?.message || "Failed to send offer");
-    }
+    await lawyerOffer(apptId, { offered_fee: Number(offerFee) });
+    load();
   };
 
   const accept = async () => {
-    try {
-      setErr("");
-      await lawyerAccept(apptId);
-      await load();
-    } catch (e) {
-      setErr(e?.message || "Failed to accept");
-    }
+    await lawyerAccept(apptId);
+    load();
   };
 
   const reject = async () => {
+    await lawyerReject(apptId);
+    load();
+  };
+
+  /* ================= FILE UPLOAD ================= */
+  const handleUpload = async () => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("appointment_id", apptId);
+
     try {
-      setErr("");
-      await lawyerReject(apptId);
-      await load();
+      // 👉 replace with your API
+      await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      alert("Document uploaded");
+      setFile(null);
     } catch (e) {
-      setErr(e?.message || "Failed to reject");
+      alert("Upload failed");
     }
   };
 
-  if (loading) return <div className="p-6">Loading appointment...</div>;
-
-  if (!appt) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-10">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-[#142768]">Appointment Details</h1>
-          <Link
-            to="/lawyer/dashboard"
-            className="border border-[#142768] text-[#142768] px-4 py-2 rounded-xl hover:bg-blue-50 transition"
-          >
-            Back
-          </Link>
-        </div>
-        {err ? (
-          <div className="mt-6 bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-xl">
-            {err}
-          </div>
-        ) : null}
-      </div>
-    );
-  }
+  if (!appt) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-[#142768]">Appointment Details</h1>
-          <p className="text-gray-600 mt-2">
-            Review request, negotiate fee, and confirm outcome.
-          </p>
-        </div>
 
-        <Link
-          to="/lawyer/dashboard"
-          className="border border-[#142768] text-[#142768] px-4 py-2 rounded-xl hover:bg-blue-50 transition"
-        >
-          Back to Dashboard
-        </Link>
+      {/* ================= HEADER ================= */}
+      <div className="flex justify-between">
+        <h1 className="text-3xl font-bold text-[#142768]">
+          Appointment Details
+        </h1>
+        <Link to="/lawyer/dashboard">Back</Link>
       </div>
 
-      {err ? (
-        <div className="bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-xl">
-          {err}
-        </div>
-      ) : null}
+      {/* ================= SUMMARY ================= */}
+      <div className="bg-white p-6 rounded-2xl shadow">
+        <h2 className="text-xl font-bold">{appt.subject}</h2>
+        <p>{appt.client_name}</p>
 
-      {/* Appointment Summary */}
-      <div className="bg-white border rounded-2xl shadow-sm p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <div className="text-xl font-bold text-[#142768]">{appt.subject}</div>
-            <div className="text-sm text-gray-600 mt-1">
-              Client: <span className="font-semibold">{appt.client_name}</span>
-            </div>
-            <div className="text-sm text-gray-500">
-              {appt.appointment_date} • {appt.appointment_time}
-            </div>
-            {appt.details ? (
-              <div className="text-sm text-gray-700 mt-3">{appt.details}</div>
-            ) : null}
-          </div>
-
-          <div className={`text-xs px-3 py-1 rounded-full ${statusPill(appt.status)}`}>
-            {appt.status}
-          </div>
-        </div>
-
-        {/* Fee Summary */}
-        <div className="mt-5 grid sm:grid-cols-3 gap-3 text-sm">
-          <div className="border rounded-xl p-3">
-            <div className="text-gray-500">Client Proposed</div>
-            <div className="font-semibold">{money(appt.proposed_fee)}</div>
-          </div>
-          <div className="border rounded-xl p-3">
-            <div className="text-gray-500">Your Offer</div>
-            <div className="font-semibold">{money(appt.offered_fee)}</div>
-          </div>
-          <div className="border rounded-xl p-3">
-            <div className="text-gray-500">Final Fee</div>
-            <div className="font-semibold">{money(appt.final_fee)}</div>
-          </div>
-        </div>
-
-        {/* Negotiation Actions */}
-        <div className="mt-6 flex flex-wrap gap-3 items-center">
-          <input
-            className="border rounded-xl px-3 py-2 w-56"
-            type="number"
-            min="0"
-            step="1"
-            placeholder="Offer fee (Rs.)"
-            value={offerFee}
-            onChange={(e) => setOfferFee(e.target.value)}
-            disabled={isFinal}
-          />
-
-          <button
-            onClick={sendOffer}
-            className="border border-[#142768] text-[#142768] px-4 py-2 rounded-xl hover:bg-blue-50 transition"
-            disabled={isFinal}
-          >
-            Send Offer
-          </button>
-
-          <button
-            onClick={accept}
-            className="bg-[#142768] text-white px-4 py-2 rounded-xl hover:opacity-95 transition"
-            disabled={isFinal}
-          >
-            Accept
-          </button>
-
-          <button
-            onClick={reject}
-            className="bg-red-600 text-white px-4 py-2 rounded-xl hover:opacity-95 transition"
-            disabled={isFinal}
-          >
-            Reject
-          </button>
-
-          {isFinal ? (
-            <div className="text-xs text-gray-500">
-              This appointment is finalized. Actions are disabled.
-            </div>
-          ) : null}
+        <div className="grid grid-cols-3 gap-4 mt-4">
+          <div>Proposed: {money(appt.proposed_fee)}</div>
+          <div>Offer: {money(appt.offered_fee)}</div>
+          <div>Final: {money(appt.final_fee)}</div>
         </div>
       </div>
 
-      {/* Negotiation Chat */}
-      <div className="bg-white border rounded-2xl shadow-sm p-6">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-bold text-[#142768]">Negotiation Chat</h2>
-            <p className="text-sm text-gray-600">
-              Discuss the case and agree on fees before approval.
-            </p>
+      {/* ================= NEGOTIATION ================= */}
+      {!isPaid && (
+        <div className="bg-white p-6 rounded-2xl shadow">
+          <h2 className="text-lg font-bold mb-3">Negotiation Panel</h2>
+
+          {!isFinal && (
+            <div className="flex gap-3">
+              <input
+                type="number"
+                value={offerFee}
+                onChange={(e) => setOfferFee(e.target.value)}
+                className="border px-3 py-2 rounded-xl"
+              />
+
+              <button onClick={sendOffer} className="btn">
+                Send Offer
+              </button>
+
+              <button onClick={accept} className="btn bg-green-600 text-white">
+                Accept
+              </button>
+
+              <button onClick={reject} className="btn bg-red-600 text-white">
+                Reject
+              </button>
+            </div>
+          )}
+
+          {/* negotiation chat */}
+          <div className="mt-4">
+            <NegotiationChat appointmentId={apptId} />
           </div>
         </div>
+      )}
 
-        <div className="mt-5">
-          <NegotiationChat appointmentId={appt.appointment_id} title="Client ↔ Lawyer Chat" />
+      {/* ================= POST PAYMENT CHAT ================= */}
+      {isPaid && (
+        <div className="bg-white p-6 rounded-2xl shadow">
+          <h2 className="text-lg font-bold mb-3">
+            Case Discussion
+          </h2>
+
+          {/* Chat */}
+          <NegotiationChat appointmentId={apptId} />
+
+          {/* File Upload */}
+          <div className="mt-6 border-t pt-4">
+            <h3 className="font-semibold mb-2">Upload Documents</h3>
+
+            <input
+              type="file"
+              onChange={(e) => setFile(e.target.files[0])}
+            />
+
+            <button
+              onClick={handleUpload}
+              className="ml-3 px-4 py-2 bg-[#142768] text-white rounded-xl"
+            >
+              Upload
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
