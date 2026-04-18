@@ -4,13 +4,13 @@ import {
   clientCounter,
   myAppointments,
 } from "../../api/appointmentsApi";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { initiateAppointmentEsewa } from "../../api/paymentApi";
 import NegotiationChat from "../../components/layout/NegotiationChat";
 
 /* ================= MESSAGE COMPONENT ================= */
 const MessageList = ({ messages, type }) => {
-  const filtered = messages.filter((m) => m.message_type === type);
+  const filtered = (messages || []).filter((m) => m.message_type === type);
 
   return (
     <div className="space-y-3">
@@ -56,13 +56,16 @@ const Profile = () => {
   }, [paymentStatus]);
 
   const counter = async (id) => {
-    await clientCounter(id, {
-      proposed_fee: Number(counterMap[id]),
-    });
+    const val = Number(counterMap[id]);
+    if (!val || val <= 0) return;
+
+    await clientCounter(id, { proposed_fee: val });
     load();
   };
 
-  const acceptOffer = async (id) => {
+  const acceptOffer = async (id, last_offered_by) => {
+    if (last_offered_by !== "lawyer") return;
+
     await clientConfirm(id);
     load();
   };
@@ -114,44 +117,31 @@ const Profile = () => {
 
       {paymentStatus === "success" && (
         <div className="mb-6 p-4 rounded-xl bg-green-100 text-green-700 shadow">
-          Payment successful ✅
+          Payment successful
         </div>
       )}
 
       <div className="grid grid-cols-4 gap-6">
-        {/* ================= ACTIVE (PAID) ================= */}
+
+        {/* ================= ACTIVE ================= */}
         <div className="col-span-3 space-y-6">
           {items.map((a) => {
-            const isPaid = ["paid", "completed"].includes(a.status);
-            if (!isPaid) return null;
+            const isActive = ["approved", "completed"].includes(a.status);
+            if (!isActive) return null;
 
             return (
-              <div
-                key={a.appointment_id}
-                className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    {a.subject}
-                  </h2>
-                  <span className="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
-                    Active Case
-                  </span>
-                </div>
+              <div key={a.appointment_id} className="bg-white rounded-3xl p-6 shadow-lg border">
+                <h2 className="text-xl font-semibold">{a.subject}</h2>
 
-                {/* CHAT */}
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <MessageList messages={a.messages || []} type="chat" />
-                  <NegotiationChat appointmentId={a.appointment_id} />
+                <div className="bg-gray-50 p-4 rounded-xl mt-4">
+                  <MessageList messages={a.messages} type="chat" />
+                  <NegotiationChat appointmentId={a.appointment_id} status={a.status} />
                 </div>
-
-                {/* DOCUMENT */}
-                <div className="mt-5">
-                  <h3 className="font-semibold mb-2">📎 Upload Document</h3>
-                  <div className="flex items-center gap-2">
+                {
+                  a.status !== "completed" &&
+                  <div className="mt-4">
                     <input
                       type="file"
-                      className="text-sm"
                       onChange={(e) =>
                         setFileMap({
                           ...fileMap,
@@ -159,100 +149,104 @@ const Profile = () => {
                         })
                       }
                     />
-                    <button
-                      onClick={() => uploadDoc(a.appointment_id)}
-                      className="px-4 py-2 bg-[#142768] text-white rounded-lg hover:bg-blue-800 transition"
-                    >
+                    <button onClick={() => uploadDoc(a.appointment_id)} className="ml-3 btn">
                       Upload
                     </button>
                   </div>
-                </div>
 
-                {/* DOCUMENT LIST */}
-                <div className="mt-4 bg-gray-50 p-4 rounded-xl">
-                  <h3 className="font-semibold mb-2">📂 Documents</h3>
-                  <MessageList messages={a.messages || []} type="document" />
-                </div>
+                }
               </div>
             );
           })}
         </div>
 
-        {/* ================= PENDING ================= */}
         <div className="space-y-6">
           {items.map((a) => {
-            const isPaid = ["paid", "completed"].includes(a.status);
-            if (isPaid) return null;
+            const isPending = !["approved", "completed"].includes(a.status);
+            if (!isPending) return null;
+
+            const showPay = a.status === "awaiting_payment";
+            const canAccept = a.last_offered_by === "lawyer";
 
             return (
-              <div
-                key={a.appointment_id}
-                className="bg-white p-5 rounded-2xl shadow border border-yellow-100"
-              >
-                <h2 className="font-semibold mb-3 text-gray-800">
-                  {a.subject}
-                </h2>
+              <div key={a.appointment_id} className="bg-white p-5 rounded-2xl shadow border border-yellow-100">
 
-                <div className="bg-yellow-50 p-3 rounded-lg">
-                  {console.log(a)}
-                  <h3 className="text-sm font-semibold mb-2">Negotiation</h3>
-                  <h3>Proposed Fee: Rs.{a.proposed_fee}</h3>
-                  <h3>Offered Fee: Rs.{a.offered_fee}</h3>
-                  <h3>Final Fee: Rs.{a.final_fee}</h3>
-                  <h3>last_offered by: {a.last_offered_by}</h3>
+                <h2 className="font-semibold">{a.subject}</h2>
 
-                  <MessageList
-                    messages={a.messages || []}
-                    type="negotiation"
-                  />
-
-                  <div className="flex flex-col gap-2 mt-3">
-                    <input
-                      type="number"
-                      placeholder="Enter counter offer"
-                      className="px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                      onChange={(e) =>
-                        setCounterMap({
-                          ...counterMap,
-                          [a.appointment_id]: e.target.value,
-                        })
-                      }
-                    />
-                    {
-                      a.status != "approved" ?
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => counter(a.appointment_id)}
-                            className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-                          >
-                            Counter
-                          </button>
-
-                          <button
-                            onClick={() => acceptOffer(a.appointment_id)}
-                            className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
-                          >
-                            Accept
-                          </button>
-                        </div>
-                        :
-                        <button
-                          onClick={() => handlePay(a.appointment_id)}
-                          className="mt-4 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
-                        >
-                          Pay Now
-                        </button>
-
-                    }
-                  </div>
+                <div className="text-sm mt-1">
+                  Lawyer:{" "}
+                  <Link
+                    to={`/lawyers/${a.lawyer_id}`}
+                    className="text-blue-600 underline"
+                  >
+                    {a.lawyer_name}
+                  </Link>
                 </div>
 
-                {/* {a.status === "awaiting_payment" && (
-                )} */}
+                <div className="bg-yellow-50 p-3 rounded-lg mt-3">
+                  <h3 className="text-sm font-semibold mb-2">Negotiation</h3>
+
+                  <div className="text-sm space-y-1">
+                    <div>Proposed: Rs.{a.proposed_fee}</div>
+                    <div>Offered: Rs.{a.offered_fee}</div>
+                    <div>Offered By: {a.last_offered_by}</div>
+                  </div>
+
+                  <MessageList messages={a.messages} type="negotiation" />
+
+                  <div className="flex flex-col gap-2 mt-3">
+
+                    {!showPay && (
+                      <>
+                        <input
+                          type="number"
+                          placeholder="Enter counter offer"
+                          className="px-3 py-2 border rounded-lg"
+                          onChange={(e) =>
+                            setCounterMap({
+                              ...counterMap,
+                              [a.appointment_id]: e.target.value,
+                            })
+                          }
+                        />
+
+                        {canAccept && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => counter(a.appointment_id)}
+                              className="flex-1 bg-blue-600 text-white py-2 rounded-lg"
+                            >
+                              Counter
+                            </button>
+
+                            <button
+                              onClick={() =>
+                                acceptOffer(a.appointment_id, a.last_offered_by)
+                              }
+                              className="flex-1 bg-green-600 text-white py-2 rounded-lg"
+                            >
+                              Accept
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {showPay && (
+                      <button
+                        onClick={() => handlePay(a.appointment_id)}
+                        className="mt-4 w-full bg-green-600 text-white py-2 rounded-lg"
+                      >
+                        Pay Now
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             );
           })}
         </div>
+
       </div>
     </div>
   );

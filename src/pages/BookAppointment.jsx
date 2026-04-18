@@ -91,7 +91,7 @@ const BookAppointment = () => {
             <div>
               <label className="text-sm font-medium text-gray-700">Proposed Fee (per hour)</label>
               <input className="w-full mt-1 border rounded-xl px-3 py-2" type="number" min="0" step="0.01" value={proposed_fee} onChange={(e) => setProposedFee(e.target.value)} />
-              <p className="text-xs text-gray-500 mt-1">Lawyer default rate: ${Number(lawyer.hourly_rate || 0).toFixed(2)}/hr</p>
+              <p className="text-xs text-gray-500 mt-1">Lawyer default rate: Rs.{Number(lawyer.hourly_rate || 0).toFixed(2)}/hr</p>
             </div>
           </div>
 

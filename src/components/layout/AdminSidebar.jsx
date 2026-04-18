@@ -17,15 +17,12 @@ const AdminSidebar = () => {
   };
 
   return (
-    <aside className="w-64 min-h-screen bg-white border-r flex flex-col justify-between">
+    <aside className="w-64 h-screen bg-white border-r flex flex-col justify-between sticky top-0">
       
-      {/* ===== TOP ===== */}
       <div className="p-6 space-y-6">
         
-        {/* LOGO / BRAND */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#142768] flex items-center justify-center text-white font-bold text-lg">
-            {/* Replace with <img src="/logo.png" /> if you have */}
             A
           </div>
           <div className="text-lg font-bold text-[#142768]">
@@ -33,10 +30,9 @@ const AdminSidebar = () => {
           </div>
         </div>
 
-        {/* NAVIGATION */}
         <nav className="space-y-2">
           <NavLink to="/" className={linkClass}>
-            <span>🏠</span> Home
+            <span>🏠</span> Go to Home
           </NavLink>
 
           <NavLink to="/admin/users" className={linkClass}>
@@ -50,17 +46,21 @@ const AdminSidebar = () => {
           <NavLink to="/admin/appointments" className={linkClass}>
             <span>📅</span> Appointments
           </NavLink>
+
           <NavLink to="/admin/notary" className={linkClass}>
             <span>📃</span> Notary
           </NavLink>
 
-          <NavLink to="/admin/n" className={linkClass}>
+          <NavLink to="/admin/faq" className={linkClass}>
+            <span>❓</span> FAQ
+          </NavLink>
+
+          <NavLink to="/admin/admins" className={linkClass}>
             <span>🛡️</span> Admins
           </NavLink>
         </nav>
       </div>
 
-      {/* ===== FOOTER ===== */}
       <div className="p-6 border-t">
         <button
           onClick={logout}

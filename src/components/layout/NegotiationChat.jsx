@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { getMessages, sendMessage } from "../../api/messagesApi";
+import { completeAppointment } from "../../api/appointmentsApi";
 
-const NegotiationChat = ({ appointmentId, title = "Negotiation" }) => {
+const NegotiationChat = ({ appointmentId, title = "Conversation", status }) => {
   const [msgs, setMsgs] = useState([]);
   const [text, setText] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
+  const [completing, setCompleting] = useState(false);
 
   const load = async () => {
     try {
@@ -20,13 +22,14 @@ const NegotiationChat = ({ appointmentId, title = "Negotiation" }) => {
   useEffect(() => {
     if (!appointmentId) return;
     load();
-    const t = setInterval(load, 4000); 
+    const t = setInterval(load, 4000);
     return () => clearInterval(t);
   }, [appointmentId]);
 
   const submit = async (e) => {
     e.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim() || status === "completed") return;
+
     setLoading(true);
     try {
       await sendMessage(appointmentId, text.trim());
@@ -39,9 +42,45 @@ const NegotiationChat = ({ appointmentId, title = "Negotiation" }) => {
     }
   };
 
+  const handleComplete = async () => {
+    try {
+      setCompleting(true);
+      await completeAppointment(appointmentId, {});
+      await load();
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setCompleting(false);
+    }
+  };
+
+  const auth = JSON.parse(localStorage.getItem("auth") || "{}");
+  const isClient = auth?.user?.role === "client";
+
+  const isCompleted = status === "completed";
+  const canComplete = isClient && status === "approved";
+
   return (
     <div className="border rounded-2xl p-4 bg-white">
-      <div className="font-semibold text-[#142768]">{title}</div>
+      <div className="font-semibold text-[#142768] flex justify-between items-center">
+        {title}
+
+        {isCompleted && (
+          <span className="text-green-600 text-sm font-medium">
+            Completed
+          </span>
+        )}
+
+        {!isCompleted && canComplete && (
+          <button
+            onClick={handleComplete}
+            disabled={completing}
+            className="bg-green-600 text-white px-3 py-1 rounded-lg text-sm"
+          >
+            {completing ? "Completing..." : "Mark Complete"}
+          </button>
+        )}
+      </div>
 
       {err ? <div className="text-sm text-red-600 mt-2">{err}</div> : null}
 
@@ -50,7 +89,8 @@ const NegotiationChat = ({ appointmentId, title = "Negotiation" }) => {
           msgs.map((m) => (
             <div key={m.message_id} className="mb-3">
               <div className="text-xs text-gray-500">
-                {m.sender_role.toUpperCase()} • {new Date(m.created_at).toLocaleString()}
+                {m.sender_role.toUpperCase()} •{" "}
+                {new Date(m.created_at).toLocaleString()}
               </div>
               <div className="text-sm text-gray-800">{m.message}</div>
             </div>
@@ -60,21 +100,23 @@ const NegotiationChat = ({ appointmentId, title = "Negotiation" }) => {
         )}
       </div>
 
-      <form onSubmit={submit} className="mt-3 flex gap-2">
-        <input
-          className="flex-1 border rounded-xl px-3 py-2"
-          placeholder="Type a message..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          disabled={loading}
-        />
-        <button
-          className="bg-[#142768] text-white px-4 py-2 rounded-xl hover:opacity-95"
-          disabled={loading}
-        >
-          Send
-        </button>
-      </form>
+      {!isCompleted && (
+        <form onSubmit={submit} className="mt-3 flex gap-2">
+          <input
+            className="flex-1 border rounded-xl px-3 py-2"
+            placeholder="Type a message..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            disabled={loading}
+          />
+          <button
+            className="bg-[#142768] text-white px-4 py-2 rounded-xl hover:opacity-95"
+            disabled={loading}
+          >
+            Send
+          </button>
+        </form>
+      )}
     </div>
   );
 };

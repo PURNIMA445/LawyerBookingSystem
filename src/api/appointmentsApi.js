@@ -41,3 +41,38 @@ export const clientConfirm = (id) =>
     method: "PATCH",
     headers: { ...authHeader() },
   });
+
+  
+  import axios from "axios";
+
+
+const getToken = () => {
+  const auth = JSON.parse(localStorage.getItem("auth"));
+  return auth?.token;
+};
+
+const config = () => ({
+  headers: {
+    Authorization: `Bearer ${getToken()}`,
+  },
+});
+
+/* ================= GET BY ID ================= */
+export const getAppointmentById = async (id) => {
+  try {
+    const res = await axios.get(`${API_SERVER}/api/appointments/${id}`, config());
+    return res.data;
+  } catch (e) {
+    return { error: e.response?.data?.error || "Failed to fetch appointment" };
+  }
+};
+
+/* ================= COMPLETE ================= */
+export const completeAppointment = async (id, data) => {
+  try {
+    const res = await axios.patch(`${API_SERVER}/api/appointments/${id}/complete`, data, config());
+    return res.data;
+  } catch (e) {
+    return { error: e.response?.data?.error || "Failed to complete appointment" };
+  }
+};

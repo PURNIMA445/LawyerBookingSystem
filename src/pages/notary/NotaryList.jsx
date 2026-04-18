@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { listNotary } from "../../api/notaryApi";
+import { isLoggedIn } from "../../api/userApi";
 
 const formatDate = (d) => {
   if (!d) return "—";
@@ -49,6 +50,9 @@ const NotaryList = () => {
       setLoading(false);
     }
   };
+
+  const {role} = isLoggedIn()
+  console.log(role)
 
   useEffect(() => {
     load();
@@ -206,7 +210,7 @@ const NotaryList = () => {
 
                     <td className="px-6 sm:px-8 py-5 text-right">
                       <Link
-                        to={`/notary/${n.notary_id}`}
+                        to={`${role==="admin"?'/admin':''}/notary/${n.notary_id}`}
                         className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-[#142768] shadow-sm hover:bg-gray-50 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-indigo-200"
                       >
                         View <span className="ml-1">→</span>

@@ -39,6 +39,7 @@ import NotaryList from './pages/notary/NotaryList'
 import AdminAppointmentDetails from './pages/admin/AdminAppointmentDetails'
 import ResetPassword from './pages/ResetPassword'
 import VerifyEmail from './pages/verifyEmail'
+import FaqPage from './pages/admin/FaqPage'
 const MyRoute = () => {
   return (
 
@@ -93,6 +94,7 @@ const MyRoute = () => {
             <Route path='clients/:clientId' element={<AdminClientProfile />} />
             <Route path='notary' element={<NotaryList />} />
             <Route path='notary/:id' element={<NotaryDetails />} />
+            <Route path='faq' element = {<FaqPage/>} />
           </Route>
         </Route>
 
